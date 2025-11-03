@@ -6,9 +6,12 @@ const upload = require('../middleware/upload');
 
 router.use(auth);
 
-router.get('/perfil', userController.getPerfil);
-router.put('/perfil', userController.atualizarPerfil);
-router.post('/foto', upload.single('foto'), userController.uploadFoto);
-router.put('/senha', userController.alterarSenha);
+
+router.get('/perfil', auth, userController.getPerfil);
+router.put('/perfil', auth, userController.atualizarPerfil);
+router.put('/senha', auth, userController.alterarSenha);
+router.post('/foto', auth, upload.single('foto'), userController.uploadFoto);
+
+router.get('/avatar/:filename', userController.getAvatar);
 
 module.exports = router;

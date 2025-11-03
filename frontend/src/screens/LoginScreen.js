@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, Text, Card, Title, Switch, Portal, Modal, ActivityIndicator } from 'react-native-paper';
+import { TextInput, Button, Text, Card, Title, Portal, Modal } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../services/api';
 
@@ -26,10 +26,8 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       const response = await authAPI.login(email, senha);
-      
       await AsyncStorage.setItem('@token', response.data.token);
       await AsyncStorage.setItem('@usuario', JSON.stringify(response.data.usuario));
-      
       navigation.replace('Main');
     } catch (error) {
       Alert.alert('Erro', error.response?.data?.error || 'Erro ao fazer login');
@@ -57,10 +55,8 @@ export default function LoginScreen({ navigation }) {
       };
 
       const response = await authAPI.registrar(dadosUsuario);
-      
       await AsyncStorage.setItem('@token', response.data.token);
       await AsyncStorage.setItem('@usuario', JSON.stringify(response.data.usuario));
-      
       navigation.replace('Main');
     } catch (error) {
       Alert.alert('Erro', error.response?.data?.error || 'Erro ao registrar');
@@ -100,7 +96,7 @@ export default function LoginScreen({ navigation }) {
               {isRegistrando ? 'Criar Conta' : 'TaskMind'}
             </Title>
             <Text style={styles.subtitle}>
-              {isRegistrando ? 'Preencha seus dados' : 'Entre na sua conta'}
+              {isRegistrando ? 'Preencha seus dados abaixo' : 'Entre na sua conta'}
             </Text>
             
             {isRegistrando && (
@@ -112,6 +108,7 @@ export default function LoginScreen({ navigation }) {
                   style={styles.input}
                   mode="outlined"
                   left={<TextInput.Icon icon="account" />}
+                  theme={{ colors: { primary: '#f5b400' } }}
                 />
                 
                 <TextInput
@@ -121,6 +118,7 @@ export default function LoginScreen({ navigation }) {
                   style={styles.input}
                   mode="outlined"
                   left={<TextInput.Icon icon="school" />}
+                  theme={{ colors: { primary: '#f5b400' } }}
                 />
                 
                 <View style={styles.row}>
@@ -131,6 +129,7 @@ export default function LoginScreen({ navigation }) {
                     style={[styles.input, styles.halfInput]}
                     mode="outlined"
                     keyboardType="numeric"
+                    theme={{ colors: { primary: '#f5b400' } }}
                   />
                   
                   <TextInput
@@ -140,6 +139,7 @@ export default function LoginScreen({ navigation }) {
                     style={[styles.input, styles.halfInput]}
                     mode="outlined"
                     placeholder="DD/MM/AAAA"
+                    theme={{ colors: { primary: '#f5b400' } }}
                   />
                 </View>
                 
@@ -151,6 +151,7 @@ export default function LoginScreen({ navigation }) {
                   mode="outlined"
                   keyboardType="phone-pad"
                   left={<TextInput.Icon icon="phone" />}
+                  theme={{ colors: { primary: '#f5b400' } }}
                 />
               </>
             )}
@@ -164,6 +165,7 @@ export default function LoginScreen({ navigation }) {
               keyboardType="email-address"
               autoCapitalize="none"
               left={<TextInput.Icon icon="email" />}
+              theme={{ colors: { primary: '#f5b400' } }}
             />
             
             <TextInput
@@ -174,6 +176,7 @@ export default function LoginScreen({ navigation }) {
               mode="outlined"
               secureTextEntry
               left={<TextInput.Icon icon="lock" />}
+              theme={{ colors: { primary: '#f5b400' } }}
             />
             
             <Button
@@ -183,6 +186,8 @@ export default function LoginScreen({ navigation }) {
               disabled={loading}
               style={styles.button}
               contentStyle={styles.buttonContent}
+              buttonColor="#f5b400"
+              textColor="#000"
             >
               {isRegistrando ? 'Criar Conta' : 'Entrar'}
             </Button>
@@ -192,19 +197,21 @@ export default function LoginScreen({ navigation }) {
                 mode="text"
                 onPress={() => setShowRecuperacao(true)}
                 style={styles.linkButton}
+                textColor="#f5b400"
               >
                 Esqueci minha senha
               </Button>
             )}
             
             <View style={styles.switchContainer}>
-              <Text>
+              <Text style={{ color: '#555' }}>
                 {isRegistrando ? 'Já tem conta?' : 'Não tem conta?'}
               </Text>
               <Button
                 mode="text"
                 onPress={() => setIsRegistrando(!isRegistrando)}
                 style={styles.toggleButton}
+                textColor="#f5b400"
               >
                 {isRegistrando ? 'Fazer Login' : 'Criar Conta'}
               </Button>
@@ -222,7 +229,7 @@ export default function LoginScreen({ navigation }) {
         >
           <Card>
             <Card.Content>
-              <Title>Recuperar Senha</Title>
+              <Title style={{ color: '#000' }}>Recuperar Senha</Title>
               <Text style={styles.modalText}>
                 Informe seu email para receber as instruções de recuperação
               </Text>
@@ -234,6 +241,7 @@ export default function LoginScreen({ navigation }) {
                 style={styles.input}
                 mode="outlined"
                 keyboardType="email-address"
+                theme={{ colors: { primary: '#f5b400' } }}
               />
               
               <View style={styles.modalButtons}>
@@ -241,6 +249,8 @@ export default function LoginScreen({ navigation }) {
                   mode="outlined"
                   onPress={() => setShowRecuperacao(false)}
                   style={styles.modalButton}
+                  textColor="#f5b400"
+                  outlineColor="#f5b400"
                 >
                   Cancelar
                 </Button>
@@ -249,6 +259,8 @@ export default function LoginScreen({ navigation }) {
                   onPress={handleRecuperarSenha}
                   loading={loading}
                   style={styles.modalButton}
+                  buttonColor="#f5b400"
+                  textColor="#000"
                 >
                   Enviar
                 </Button>
@@ -264,7 +276,7 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fdfdfd',
   },
   scrollContent: {
     flexGrow: 1,
@@ -273,20 +285,25 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 10,
-    elevation: 4,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    elevation: 3,
   },
   title: {
     textAlign: 'center',
     marginBottom: 5,
-    fontSize: 24,
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#000',
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 20,
-    color: '#666',
+    color: '#777',
   },
   input: {
     marginBottom: 15,
+    backgroundColor: '#fff',
   },
   row: {
     flexDirection: 'row',
@@ -297,7 +314,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 10,
-    padding: 5,
+    borderRadius: 12,
   },
   buttonContent: {
     paddingVertical: 8,
@@ -328,5 +345,6 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 0.48,
+    borderRadius: 10,
   },
 });

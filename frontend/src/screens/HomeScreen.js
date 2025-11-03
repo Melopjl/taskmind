@@ -56,7 +56,7 @@ export default function HomeScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color="#f5b400" />
         <Text style={styles.loadingText}>Carregando...</Text>
       </View>
     );
@@ -66,19 +66,19 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#f5b400']} />
         }
       >
         {/* Header Boas-vindas */}
         <Card style={styles.welcomeCard}>
           <Card.Content>
             <Title style={styles.welcomeTitle}>
-              Olá, {usuario?.nome?.split(' ')[0] || 'Estudante'}! 👋
+              Olá, {usuario?.nome?.split(' ')[0] || 'Estudante'} 👋
             </Title>
             <Text style={styles.welcomeSubtitle}>
-              Bem-vindo ao seu sistema acadêmico
+              Bem-vindo de volta ao seu espaço de foco
             </Text>
-            
+
             {dashboard?.estatisticas && (
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
@@ -114,11 +114,11 @@ export default function HomeScreen({ navigation }) {
             <Card.Content>
               <View style={styles.sectionHeader}>
                 <Title style={styles.sectionTitle}>⚠️ Tarefas Atrasadas</Title>
-                <Chip mode="outlined" style={styles.urgentChip}>
+                <Chip mode="outlined" style={styles.urgentChip} textStyle={{ color: '#fff' }}>
                   {dashboard.tarefas_atrasadas.length}
                 </Chip>
               </View>
-              
+
               {dashboard.tarefas_atrasadas.slice(0, 3).map((tarefa) => (
                 <View key={tarefa.id} style={styles.taskItem}>
                   <Text style={styles.taskTitle}>{tarefa.titulo}</Text>
@@ -127,11 +127,13 @@ export default function HomeScreen({ navigation }) {
                   </Text>
                 </View>
               ))}
-              
-              <Button 
-                mode="outlined" 
+
+              <Button
+                mode="outlined"
                 onPress={() => navigation.navigate('Tasks', { filtro: 'atrasadas' })}
                 style={styles.verTudoButton}
+                textColor="#000"
+                outlineColor="#f5b400"
               >
                 Ver Todas
               </Button>
@@ -144,38 +146,40 @@ export default function HomeScreen({ navigation }) {
           <Card.Content>
             <View style={styles.sectionHeader}>
               <Title style={styles.sectionTitle}>📅 Próximas Tarefas</Title>
-              <Button 
-                mode="text" 
+              <Button
+                mode="text"
                 onPress={() => navigation.navigate('Tasks')}
                 compact
+                textColor="#f5b400"
               >
                 Ver Todas
               </Button>
             </View>
-            
+
             {dashboard?.proximas_tarefas?.length > 0 ? (
               dashboard.proximas_tarefas.slice(0, 5).map((tarefa) => (
                 <View key={tarefa.id} style={styles.taskItem}>
                   <View style={styles.taskHeader}>
                     <Text style={styles.taskTitle}>{tarefa.titulo}</Text>
-                    <Chip 
-                      mode="outlined" 
-                      size="small"
+                    <Chip
+                      mode="flat"
                       style={[
                         styles.priorityChip,
-                        { backgroundColor: 
-                          tarefa.prioridade === 'alta' ? '#f44336' :
-                          tarefa.prioridade === 'media' ? '#ff9800' : '#4caf50'
-                        }
+                        {
+                          backgroundColor:
+                            tarefa.prioridade === 'alta'
+                              ? '#f44336'
+                              : tarefa.prioridade === 'media'
+                              ? '#f5b400'
+                              : '#4caf50',
+                        },
                       ]}
-                      textStyle={styles.chipText}
+                      textStyle={{ color: '#fff', fontSize: 10 }}
                     >
                       {tarefa.prioridade}
                     </Chip>
                   </View>
-                  <Text style={styles.taskDate}>
-                    {formatarData(tarefa.data_vencimento)}
-                  </Text>
+                  <Text style={styles.taskDate}>{formatarData(tarefa.data_vencimento)}</Text>
                   {tarefa.materia && (
                     <Text style={styles.taskMateria}>{tarefa.materia}</Text>
                   )}
@@ -192,23 +196,28 @@ export default function HomeScreen({ navigation }) {
           <Card.Content>
             <View style={styles.sectionHeader}>
               <Title style={styles.sectionTitle}>🗓️ Próximos Eventos</Title>
-              <Button 
-                mode="text" 
+              <Button
+                mode="text"
                 onPress={() => navigation.navigate('Calendar')}
                 compact
+                textColor="#f5b400"
               >
                 Ver Calendário
               </Button>
             </View>
-            
+
             {dashboard?.proximos_eventos?.length > 0 ? (
               dashboard.proximos_eventos.slice(0, 3).map((evento) => (
                 <View key={evento.id} style={styles.eventItem}>
                   <View style={styles.eventIcon}>
                     <Text>
-                      {evento.tipo === 'prova' ? '📝' :
-                       evento.tipo === 'aula' ? '📚' :
-                       evento.tipo === 'trabalho' ? '📋' : '📅'}
+                      {evento.tipo === 'prova'
+                        ? '📝'
+                        : evento.tipo === 'aula'
+                        ? '📚'
+                        : evento.tipo === 'trabalho'
+                        ? '📋'
+                        : '📅'}
                     </Text>
                   </View>
                   <View style={styles.eventContent}>
@@ -233,21 +242,18 @@ export default function HomeScreen({ navigation }) {
           <Card style={styles.sectionCard}>
             <Card.Content>
               <Title style={styles.sectionTitle}>📊 Desempenho do Mês</Title>
-              
+
               <View style={styles.progressContainer}>
                 <View style={styles.progressBar}>
-                  <View 
-                    style={[
-                      styles.progressFill, 
-                      { width: `${getProgresso()}%` }
-                    ]} 
+                  <View
+                    style={[styles.progressFill, { width: `${getProgresso()}%` }]}
                   />
                 </View>
                 <Text style={styles.progressText}>
                   {getProgresso().toFixed(0)}% concluído
                 </Text>
               </View>
-              
+
               <View style={styles.performanceStats}>
                 <View style={styles.performanceItem}>
                   <Text style={styles.performanceValue}>
@@ -255,7 +261,7 @@ export default function HomeScreen({ navigation }) {
                   </Text>
                   <Text style={styles.performanceLabel}>Concluídas</Text>
                 </View>
-                
+
                 {dashboard.desempenho_mensal.media_notas > 0 && (
                   <View style={styles.performanceItem}>
                     <Text style={styles.performanceValue}>
@@ -264,7 +270,7 @@ export default function HomeScreen({ navigation }) {
                     <Text style={styles.performanceLabel}>Média</Text>
                   </View>
                 )}
-                
+
                 <View style={styles.performanceItem}>
                   <Text style={styles.performanceValue}>
                     {dashboard.desempenho_mensal.tempo_estudo_minutos}
@@ -272,11 +278,13 @@ export default function HomeScreen({ navigation }) {
                   <Text style={styles.performanceLabel}>Min. estudo</Text>
                 </View>
               </View>
-              
-              <Button 
-                mode="outlined" 
+
+              <Button
+                mode="outlined"
                 onPress={() => navigation.navigate('Dashboard')}
                 style={styles.verDetalhesButton}
+                outlineColor="#f5b400"
+                textColor="#000"
               >
                 Ver Detalhes
               </Button>
@@ -290,6 +298,7 @@ export default function HomeScreen({ navigation }) {
         style={styles.fab}
         onPress={() => navigation.navigate('TaskForm')}
         label="Nova Tarefa"
+        color="#000"
       />
     </View>
   );
@@ -298,7 +307,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fdfdfd',
   },
   center: {
     flex: 1,
@@ -308,21 +317,21 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: '#777',
   },
   welcomeCard: {
     margin: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#f5b400',
+    borderRadius: 16,
   },
   welcomeTitle: {
-    color: 'white',
-    fontSize: 24,
-    marginBottom: 5,
+    color: '#000',
+    fontSize: 22,
+    fontWeight: '700',
   },
   welcomeSubtitle: {
-    color: 'white',
-    opacity: 0.9,
-    marginBottom: 15,
+    color: '#333',
+    marginBottom: 10,
   },
   statsRow: {
     flexDirection: 'row',
@@ -333,43 +342,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statNumber: {
-    color: 'white',
-    fontSize: 20,
+    color: '#000',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   statSuccess: {
     color: '#4CAF50',
   },
   statWarning: {
-    color: '#FFC107',
+    color: '#f5b400',
   },
   statDanger: {
-    color: '#F44336',
+    color: '#f44336',
   },
   statLabel: {
-    color: 'white',
+    color: '#333',
     fontSize: 12,
-    opacity: 0.9,
   },
   sectionCard: {
     margin: 10,
-    marginTop: 5,
+    borderRadius: 16,
+    backgroundColor: '#fff',
   },
   urgentCard: {
     borderLeftWidth: 4,
-    borderLeftColor: '#F44336',
+    borderLeftColor: '#f44336',
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
   },
   urgentChip: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#f44336',
   },
   taskItem: {
     paddingVertical: 8,
@@ -385,24 +396,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     flex: 1,
-    marginRight: 10,
   },
   taskDate: {
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    color: '#777',
   },
   taskMateria: {
     fontSize: 12,
-    color: '#2196F3',
-    marginTop: 2,
+    color: '#f5b400',
   },
   priorityChip: {
     height: 24,
-  },
-  chipText: {
-    color: 'white',
-    fontSize: 10,
+    borderRadius: 12,
   },
   eventItem: {
     flexDirection: 'row',
@@ -412,30 +417,25 @@ const styles = StyleSheet.create({
   },
   eventIcon: {
     marginRight: 12,
-    marginTop: 2,
-  },
-  eventContent: {
-    flex: 1,
   },
   eventTitle: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#000',
   },
   eventDate: {
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    color: '#777',
   },
   eventLocal: {
     fontSize: 12,
-    color: '#2196F3',
-    marginTop: 2,
+    color: '#f5b400',
   },
   emptyText: {
     textAlign: 'center',
-    color: '#999',
+    color: '#aaa',
     fontStyle: 'italic',
-    paddingVertical: 20,
+    paddingVertical: 15,
   },
   progressContainer: {
     marginVertical: 10,
@@ -448,8 +448,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
+    backgroundColor: '#f5b400',
   },
   progressText: {
     textAlign: 'center',
@@ -467,24 +466,17 @@ const styles = StyleSheet.create({
   performanceValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#f5b400',
   },
   performanceLabel: {
     fontSize: 12,
     color: '#666',
-    marginTop: 2,
-  },
-  verTudoButton: {
-    marginTop: 10,
-  },
-  verDetalhesButton: {
-    marginTop: 5,
   },
   fab: {
     position: 'absolute',
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#f5b400',
   },
 });

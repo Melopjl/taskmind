@@ -132,12 +132,13 @@ class DashboardController {
       
       const limiteMeses = parseInt(meses) || 6;
       
+      // Query corrigida: LIMIT não pode usar placeholder
       const [desempenho] = await db.execute(
         `SELECT * FROM desempenho 
          WHERE usuario_id = ? 
          ORDER BY mes_ano DESC 
-         LIMIT ?`,
-        [usuarioId, limiteMeses]
+         LIMIT ${limiteMeses}`,
+        [usuarioId]
       );
 
       // Calcular progresso geral

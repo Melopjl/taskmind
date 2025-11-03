@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Image } from 'react-native';
-import { Card, Title, Text, Button, TextInput, SegmentedButtons, Avatar, Portal, Modal, ActivityIndicator } from 'react-native-paper';
+import { Card, Title, Text, Button, TextInput, Avatar, Portal, Modal, ActivityIndicator } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { userAPI } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,15 +33,13 @@ export default function ProfileScreen({ navigation }) {
       setLoading(true);
       const response = await userAPI.getPerfil();
       setUsuario(response.data.usuario);
-      
-      // Preencher formulário
+
       setNome(response.data.usuario.nome);
       setCurso(response.data.usuario.curso || '');
       setSemestre(response.data.usuario.semestre?.toString() || '');
       setTelefone(response.data.usuario.telefone || '');
       setDataNascimento(response.data.usuario.data_nascimento || '');
     } catch (error) {
-      console.error('Erro ao carregar perfil:', error);
       Alert.alert('Erro', 'Não foi possível carregar o perfil');
     } finally {
       setLoading(false);
@@ -60,12 +58,11 @@ export default function ProfileScreen({ navigation }) {
       };
 
       await userAPI.atualizarPerfil(dadosAtualizacao);
-      
-      // Atualizar dados locais
+
       const usuarioAtualizado = { ...usuario, ...dadosAtualizacao };
       setUsuario(usuarioAtualizado);
       await AsyncStorage.setItem('@usuario', JSON.stringify(usuarioAtualizado));
-      
+
       setEditando(false);
       Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
     } catch (error) {
@@ -80,12 +77,10 @@ export default function ProfileScreen({ navigation }) {
       Alert.alert('Erro', 'As senhas não coincidem');
       return;
     }
-
     if (novaSenha.length < 6) {
       Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
       return;
     }
-
     try {
       setLoading(true);
       await userAPI.alterarSenha({
@@ -124,7 +119,6 @@ export default function ProfileScreen({ navigation }) {
         await uploadImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Erro ao selecionar imagem:', error);
       Alert.alert('Erro', 'Não foi possível selecionar a imagem');
     }
   };
@@ -132,24 +126,15 @@ export default function ProfileScreen({ navigation }) {
   const uploadImage = async (uri) => {
     try {
       setUploading(true);
-
       const formData = new FormData();
-      formData.append('foto', {
-        uri,
-        type: 'image/jpeg',
-        name: 'foto-perfil.jpg',
-      });
-
+      formData.append('foto', { uri, type: 'image/jpeg', name: 'foto-perfil.jpg' });
       const response = await userAPI.uploadFoto(formData);
-      
-      // Atualizar foto localmente
+
       const usuarioAtualizado = { ...usuario, foto_perfil: response.data.foto_perfil };
       setUsuario(usuarioAtualizado);
       await AsyncStorage.setItem('@usuario', JSON.stringify(usuarioAtualizado));
-      
       Alert.alert('Sucesso', 'Foto de perfil atualizada!');
     } catch (error) {
-      console.error('Erro no upload:', error);
       Alert.alert('Erro', 'Não foi possível atualizar a foto');
     } finally {
       setUploading(false);
@@ -157,27 +142,23 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Sair',
-      'Deseja realmente sair da sua conta?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Sair', 
-          style: 'destructive',
-          onPress: async () => {
-            await AsyncStorage.multiRemove(['@token', '@usuario']);
-            navigation.replace('Login');
-          }
+    Alert.alert('Sair', 'Deseja realmente sair da sua conta?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { 
+        text: 'Sair', 
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.multiRemove(['@token', '@usuario']);
+          navigation.replace('Login');
         }
-      ]
-    );
+      }
+    ]);
   };
 
   if (loading && !usuario) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color="#f5b400" />
         <Text style={styles.loadingText}>Carregando perfil...</Text>
       </View>
     );
@@ -209,6 +190,7 @@ export default function ProfileScreen({ navigation }) {
               disabled={uploading}
               style={styles.changePhotoButton}
               icon="camera"
+              textColor="#f5b400"
             >
               Alterar
             </Button>
@@ -233,6 +215,7 @@ export default function ProfileScreen({ navigation }) {
               mode="text" 
               onPress={() => setEditando(!editando)}
               compact
+              textColor="#f5b400"
             >
               {editando ? 'Cancelar' : 'Editar'}
             </Button>
@@ -240,107 +223,22 @@ export default function ProfileScreen({ navigation }) {
 
           {editando ? (
             <>
-              <TextInput
-                label="Nome Completo"
-                value={nome}
-                onChangeText={setNome}
-                style={styles.input}
-                mode="outlined"
-              />
-
-              <TextInput
-                label="Curso"
-                value={curso}
-                onChangeText={setCurso}
-                style={styles.input}
-                mode="outlined"
-              />
-
-              <TextInput
-                label="Semestre"
-                value={semestre}
-                onChangeText={setSemestre}
-                style={styles.input}
-                mode="outlined"
-                keyboardType="numeric"
-              />
-
-              <TextInput
-                label="Telefone"
-                value={telefone}
-                onChangeText={setTelefone}
-                style={styles.input}
-                mode="outlined"
-                keyboardType="phone-pad"
-              />
-
-              <TextInput
-                label="Data de Nascimento"
-                value={dataNascimento}
-                onChangeText={setDataNascimento}
-                style={styles.input}
-                mode="outlined"
-                placeholder="DD/MM/AAAA"
-              />
-
-              <Button
-                mode="contained"
-                onPress={handleSalvarPerfil}
-                loading={loading}
-                disabled={loading}
-                style={styles.saveButton}
-              >
-                Salvar Alterações
-              </Button>
+              <TextInput label="Nome Completo" value={nome} onChangeText={setNome} style={styles.input} mode="outlined" theme={{ colors: { primary: '#f5b400' } }} />
+              <TextInput label="Curso" value={curso} onChangeText={setCurso} style={styles.input} mode="outlined" theme={{ colors: { primary: '#f5b400' } }} />
+              <TextInput label="Semestre" value={semestre} onChangeText={setSemestre} style={styles.input} mode="outlined" keyboardType="numeric" theme={{ colors: { primary: '#f5b400' } }} />
+              <TextInput label="Telefone" value={telefone} onChangeText={setTelefone} style={styles.input} mode="outlined" keyboardType="phone-pad" theme={{ colors: { primary: '#f5b400' } }} />
+              <TextInput label="Data de Nascimento" value={dataNascimento} onChangeText={setDataNascimento} style={styles.input} mode="outlined" placeholder="DD/MM/AAAA" theme={{ colors: { primary: '#f5b400' } }} />
+              <Button mode="contained" onPress={handleSalvarPerfil} loading={loading} disabled={loading} style={[styles.saveButton, { backgroundColor: '#f5b400' }]} textColor="#000">Salvar Alterações</Button>
             </>
           ) : (
             <>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Nome:</Text>
-                <Text style={styles.infoValue}>{usuario?.nome}</Text>
-              </View>
-
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Email:</Text>
-                <Text style={styles.infoValue}>{usuario?.email}</Text>
-              </View>
-
-              {usuario?.curso && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Curso:</Text>
-                  <Text style={styles.infoValue}>{usuario.curso}</Text>
-                </View>
-              )}
-
-              {usuario?.semestre && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Semestre:</Text>
-                  <Text style={styles.infoValue}>{usuario.semestre}º</Text>
-                </View>
-              )}
-
-              {usuario?.telefone && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Telefone:</Text>
-                  <Text style={styles.infoValue}>{usuario.telefone}</Text>
-                </View>
-              )}
-
-              {usuario?.data_nascimento && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Data Nasc.:</Text>
-                  <Text style={styles.infoValue}>
-                    {new Date(usuario.data_nascimento).toLocaleDateString('pt-BR')}
-                  </Text>
-                </View>
-              )}
-
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Membro desde:</Text>
-                <Text style={styles.infoValue}>
-                  {new Date(usuario?.data_criacao).toLocaleDateString('pt-BR')}
-                </Text>
-              </View>
+              <View style={styles.infoRow}><Text style={styles.infoLabel}>Nome:</Text><Text style={styles.infoValue}>{usuario?.nome}</Text></View>
+              <View style={styles.infoRow}><Text style={styles.infoLabel}>Email:</Text><Text style={styles.infoValue}>{usuario?.email}</Text></View>
+              {usuario?.curso && <View style={styles.infoRow}><Text style={styles.infoLabel}>Curso:</Text><Text style={styles.infoValue}>{usuario.curso}</Text></View>}
+              {usuario?.semestre && <View style={styles.infoRow}><Text style={styles.infoLabel}>Semestre:</Text><Text style={styles.infoValue}>{usuario.semestre}º</Text></View>}
+              {usuario?.telefone && <View style={styles.infoRow}><Text style={styles.infoLabel}>Telefone:</Text><Text style={styles.infoValue}>{usuario.telefone}</Text></View>}
+              {usuario?.data_nascimento && <View style={styles.infoRow}><Text style={styles.infoLabel}>Data Nasc.:</Text><Text style={styles.infoValue}>{new Date(usuario.data_nascimento).toLocaleDateString('pt-BR')}</Text></View>}
+              <View style={styles.infoRow}><Text style={styles.infoLabel}>Membro desde:</Text><Text style={styles.infoValue}>{new Date(usuario?.data_criacao).toLocaleDateString('pt-BR')}</Text></View>
             </>
           )}
         </Card.Content>
@@ -350,15 +248,7 @@ export default function ProfileScreen({ navigation }) {
       <Card style={styles.sectionCard}>
         <Card.Content>
           <Title style={styles.sectionTitle}>🔒 Segurança</Title>
-          
-          <Button
-            mode="outlined"
-            onPress={() => setAlterarSenha(true)}
-            style={styles.securityButton}
-            icon="lock"
-          >
-            Alterar Senha
-          </Button>
+          <Button mode="outlined" onPress={() => setAlterarSenha(true)} style={styles.securityButton} icon="lock" textColor="#f5b400">Alterar Senha</Button>
         </Card.Content>
       </Card>
 
@@ -366,74 +256,23 @@ export default function ProfileScreen({ navigation }) {
       <Card style={styles.sectionCard}>
         <Card.Content>
           <Title style={styles.sectionTitle}>⚙️ Ações</Title>
-          
-          <Button
-            mode="contained"
-            onPress={handleLogout}
-            style={styles.logoutButton}
-            icon="logout"
-            buttonColor="#f44336"
-          >
-            Sair da Conta
-          </Button>
+          <Button mode="contained" onPress={handleLogout} style={styles.logoutButton} icon="logout" buttonColor="#f44336">Sair da Conta</Button>
         </Card.Content>
       </Card>
 
       {/* Modal Alterar Senha */}
       <Portal>
-        <Modal
-          visible={alterarSenha}
-          onDismiss={() => setAlterarSenha(false)}
-          contentContainerStyle={styles.modal}
-        >
+        <Modal visible={alterarSenha} onDismiss={() => setAlterarSenha(false)} contentContainerStyle={styles.modal}>
           <Card>
             <Card.Content>
-              <Title>Alterar Senha</Title>
-              
-              <TextInput
-                label="Senha Atual"
-                value={senhaAtual}
-                onChangeText={setSenhaAtual}
-                style={styles.input}
-                mode="outlined"
-                secureTextEntry
-              />
-
-              <TextInput
-                label="Nova Senha"
-                value={novaSenha}
-                onChangeText={setNovaSenha}
-                style={styles.input}
-                mode="outlined"
-                secureTextEntry
-              />
-
-              <TextInput
-                label="Confirmar Nova Senha"
-                value={confirmarSenha}
-                onChangeText={setConfirmarSenha}
-                style={styles.input}
-                mode="outlined"
-                secureTextEntry
-              />
+              <Title style={styles.modalTitle}>Alterar Senha</Title>
+              <TextInput label="Senha Atual" value={senhaAtual} onChangeText={setSenhaAtual} style={styles.modalInput} mode="outlined" secureTextEntry theme={{ colors: { primary: '#f5b400' } }} />
+              <TextInput label="Nova Senha" value={novaSenha} onChangeText={setNovaSenha} style={styles.modalInput} mode="outlined" secureTextEntry theme={{ colors: { primary: '#f5b400' } }} />
+              <TextInput label="Confirmar Nova Senha" value={confirmarSenha} onChangeText={setConfirmarSenha} style={styles.modalInput} mode="outlined" secureTextEntry theme={{ colors: { primary: '#f5b400' } }} />
 
               <View style={styles.modalButtons}>
-                <Button
-                  mode="outlined"
-                  onPress={() => setAlterarSenha(false)}
-                  style={styles.modalButton}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  mode="contained"
-                  onPress={handleAlterarSenha}
-                  loading={loading}
-                  disabled={loading}
-                  style={styles.modalButton}
-                >
-                  Alterar
-                </Button>
+                <Button mode="outlined" onPress={() => setAlterarSenha(false)} style={[styles.modalButton, styles.modalButtonOutlined]} textColor="#f5b400">Cancelar</Button>
+                <Button mode="contained" onPress={handleAlterarSenha} loading={loading} disabled={loading} style={[styles.modalButton, styles.modalButtonContained]} textColor="#000">Alterar</Button>
               </View>
             </Card.Content>
           </Card>
@@ -444,104 +283,33 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
-  },
-  profileHeader: {
-    margin: 10,
-    backgroundColor: '#2196F3',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatarContainer: {
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  avatar: {
-    backgroundColor: '#1976D2',
-  },
-  changePhotoButton: {
-    marginTop: 10,
-    borderColor: 'white',
-  },
-  userInfo: {
-    flex: 1,
-  },
-  userName: {
-    color: 'white',
-    fontSize: 20,
-  },
-  userEmail: {
-    color: 'white',
-    opacity: 0.9,
-  },
-  userCourse: {
-    color: 'white',
-    opacity: 0.9,
-    marginTop: 5,
-  },
-  sectionCard: {
-    margin: 10,
-    marginTop: 5,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 18,
-  },
-  input: {
-    marginBottom: 15,
-  },
-  saveButton: {
-    marginTop: 10,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  infoLabel: {
-    fontWeight: '500',
-    color: '#666',
-  },
-  infoValue: {
-    flex: 1,
-    textAlign: 'right',
-  },
-  securityButton: {
-    marginTop: 5,
-  },
-  logoutButton: {
-    marginTop: 5,
-  },
-  modal: {
-    margin: 20,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 15,
-  },
-  modalButton: {
-    flex: 0.48,
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { marginTop: 10, fontSize: 16, color: '#666' },
+  profileHeader: { margin: 10, backgroundColor: '#000000ff' },
+  headerContent: { flexDirection: 'row', alignItems: 'center' },
+  avatarContainer: { alignItems: 'center', marginRight: 20 },
+  avatar: { backgroundColor: '#525252ff' },
+  changePhotoButton: { marginTop: 10, borderColor: '#f5b400' },
+  userInfo: { flex: 1 },
+  userName: { color: 'white', fontSize: 20 },
+  userEmail: { color: 'white', opacity: 0.9 },
+  userCourse: { color: 'white', opacity: 0.9, marginTop: 5 },
+  sectionCard: { margin: 10, marginTop: 5 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  sectionTitle: { fontSize: 18 },
+  input: { marginBottom: 15 },
+  saveButton: { marginTop: 10 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  infoLabel: { fontWeight: '500', color: '#666' },
+  infoValue: { flex: 1, textAlign: 'right' },
+  securityButton: { marginTop: 5 },
+  logoutButton: { marginTop: 5 },
+  modal: { margin: 20, backgroundColor: '#fff', borderRadius: 8, padding: 20, borderColor: '#f5b400', borderWidth: 1 },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 },
+  modalButton: { flex: 0.48 },
+  modalButtonOutlined: { borderColor: '#f5b400' },
+  modalButtonContained: { backgroundColor: '#f5b400' },
+  modalTitle: { color: '#f5b400', marginBottom: 10 },
+  modalInput: { marginBottom: 12 },
 });

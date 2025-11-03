@@ -33,7 +33,7 @@ export default function CalendarScreen() {
       
       const response = await dashboardAPI.getCalendario(dataInicio, dataFim);
       
-      // Processar eventos para o calendário
+      
       const eventosProcessados = {};
       
       // Processar eventos
@@ -155,16 +155,16 @@ export default function CalendarScreen() {
           backgroundColor: '#ffffff',
           calendarBackground: '#ffffff',
           textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#2196F3',
+          selectedDayBackgroundColor: '#f5b400',
           selectedDayTextColor: '#ffffff',
-          todayTextColor: '#2196F3',
+          todayTextColor: '#f5b400',
           dayTextColor: '#2d4150',
           textDisabledColor: '#d9e1e8',
-          dotColor: '#2196F3',
+          dotColor: '#f5b400',
           selectedDotColor: '#ffffff',
-          arrowColor: '#2196F3',
-          monthTextColor: '#2196F3',
-          indicatorColor: '#2196F3',
+          arrowColor: '#f5b400',
+          monthTextColor: '#f5b400',
+          indicatorColor: '#f5b400',
           textDayFontWeight: '300',
           textMonthFontWeight: 'bold',
           textDayHeaderFontWeight: '300',
@@ -210,96 +210,103 @@ export default function CalendarScreen() {
       />
 
       {/* Modal Novo Evento */}
-      <Portal>
-        <Modal
-          visible={showEventModal}
-          onDismiss={() => setShowEventModal(false)}
-          contentContainerStyle={styles.modal}
-        >
-          <ScrollView>
-            <Card>
-              <Card.Content>
-                <Title>Criar Novo Evento</Title>
-                
-                <TextInput
-                  label="Título do Evento *"
-                  value={novoEvento.titulo}
-                  onChangeText={text => setNovoEvento({...novoEvento, titulo: text})}
-                  style={styles.input}
-                  mode="outlined"
-                />
+<Portal>
+  <Modal
+    visible={showEventModal}
+    onDismiss={() => setShowEventModal(false)}
+    contentContainerStyle={styles.modal}
+  >
+    <ScrollView>
+      <Card>
+        <Card.Content>
+          <Title style={styles.modalTitle}>Criar Novo Evento</Title>
+          
+          <TextInput
+            label="Título do Evento *"
+            value={novoEvento.titulo}
+            onChangeText={text => setNovoEvento({...novoEvento, titulo: text})}
+            style={styles.input}
+            mode="outlined"
+            theme={{ colors: { primary: '#f5b400' } }}
+          />
 
-                <TextInput
-                  label="Descrição"
-                  value={novoEvento.descricao}
-                  onChangeText={text => setNovoEvento({...novoEvento, descricao: text})}
-                  style={styles.input}
-                  mode="outlined"
-                  multiline
-                />
+          <TextInput
+            label="Descrição"
+            value={novoEvento.descricao}
+            onChangeText={text => setNovoEvento({...novoEvento, descricao: text})}
+            style={styles.input}
+            mode="outlined"
+            multiline
+            theme={{ colors: { primary: '#f5b400' } }}
+          />
 
-                <Text style={styles.label}>Tipo de Evento</Text>
-                <SegmentedButtons
-                  value={novoEvento.tipo}
-                  onValueChange={value => setNovoEvento({...novoEvento, tipo: value})}
-                  buttons={[
-                    { value: 'aula', label: 'Aula', icon: 'school' },
-                    { value: 'prova', label: 'Prova', icon: 'file-document' },
-                    { value: 'trabalho', label: 'Trabalho', icon: 'briefcase' },
-                    { value: 'evento', label: 'Evento', icon: 'calendar' },
-                  ]}
-                  style={styles.segmented}
-                />
+          <Text style={styles.label}>Tipo de Evento</Text>
+          <SegmentedButtons
+            value={novoEvento.tipo}
+            onValueChange={value => setNovoEvento({...novoEvento, tipo: value})}
+            buttons={[
+              { value: 'aula', label: 'Aula', icon: 'school' },
+              { value: 'prova', label: 'Prova', icon: 'file-document' },
+              { value: 'trabalho', label: 'Trabalho', icon: 'briefcase' },
+              { value: 'evento', label: 'Evento', icon: 'calendar' },
+            ]}
+            style={styles.segmented}
+          />
 
-                <TextInput
-                  label="Data de Início *"
-                  value={novoEvento.data_inicio}
-                  onChangeText={text => setNovoEvento({...novoEvento, data_inicio: text})}
-                  style={styles.input}
-                  mode="outlined"
-                  placeholder="YYYY-MM-DD HH:MM:SS"
-                />
+          <TextInput
+            label="Data de Início *"
+            value={novoEvento.data_inicio}
+            onChangeText={text => setNovoEvento({...novoEvento, data_inicio: text})}
+            style={styles.input}
+            mode="outlined"
+            placeholder="YYYY-MM-DD HH:MM:SS"
+            theme={{ colors: { primary: '#f5b400' } }}
+          />
 
-                <TextInput
-                  label="Data de Fim"
-                  value={novoEvento.data_fim}
-                  onChangeText={text => setNovoEvento({...novoEvento, data_fim: text})}
-                  style={styles.input}
-                  mode="outlined"
-                  placeholder="YYYY-MM-DD HH:MM:SS"
-                />
+          <TextInput
+            label="Data de Fim"
+            value={novoEvento.data_fim}
+            onChangeText={text => setNovoEvento({...novoEvento, data_fim: text})}
+            style={styles.input}
+            mode="outlined"
+            placeholder="YYYY-MM-DD HH:MM:SS"
+            theme={{ colors: { primary: '#f5b400' } }}
+          />
 
-                <TextInput
-                  label="Local"
-                  value={novoEvento.local}
-                  onChangeText={text => setNovoEvento({...novoEvento, local: text})}
-                  style={styles.input}
-                  mode="outlined"
-                />
+          <TextInput
+            label="Local"
+            value={novoEvento.local}
+            onChangeText={text => setNovoEvento({...novoEvento, local: text})}
+            style={styles.input}
+            mode="outlined"
+            theme={{ colors: { primary: '#f5b400' } }}
+          />
 
-                <View style={styles.modalButtons}>
-                  <Button
-                    mode="outlined"
-                    onPress={() => setShowEventModal(false)}
-                    style={styles.modalButton}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    mode="contained"
-                    onPress={handleCreateEvent}
-                    loading={loading}
-                    disabled={loading}
-                    style={styles.modalButton}
-                  >
-                    Criar Evento
-                  </Button>
-                </View>
-              </Card.Content>
-            </Card>
-          </ScrollView>
-        </Modal>
-      </Portal>
+          <View style={styles.modalButtons}>
+            <Button
+              mode="outlined"
+              onPress={() => setShowEventModal(false)}
+              style={[styles.modalButton, styles.modalButtonOutlined]}
+              textColor="#f5b400"
+            >
+              Cancelar
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleCreateEvent}
+              loading={loading}
+              disabled={loading}
+              style={[styles.modalButton, styles.modalButtonContained]}
+              textColor="#000"
+            >
+              Criar Evento
+            </Button>
+          </View>
+        </Card.Content>
+      </Card>
+    </ScrollView>
+  </Modal>
+</Portal>
     </View>
   );
 }
@@ -356,11 +363,16 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#f5b400',
   },
   modal: {
     margin: 20,
     maxHeight: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
+    borderColor: '#f5b400',
+    borderWidth: 1,
   },
   input: {
     marginBottom: 15,
@@ -369,7 +381,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#333',
+    color: '#f5b400',
   },
   segmented: {
     marginBottom: 15,
@@ -381,5 +393,15 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     flex: 0.48,
+  },
+  modalButtonOutlined: {
+    borderColor: '#f5b400',
+  },
+  modalButtonContained: {
+    backgroundColor: '#f5b400',
+  },
+  modalTitle: {
+    color: '#f5b400',
+    marginBottom: 10,
   },
 });

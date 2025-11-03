@@ -297,12 +297,13 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 16,
+    color: '#f5b400', // texto digitado
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#333',
+    color: '#f5b400', // cor das labels
   },
   dateTimeContainer: {
     flexDirection: 'row',
@@ -311,10 +312,12 @@ const styles = StyleSheet.create({
   },
   dateTimeButton: {
     flex: 0.48,
+    borderColor: '#f5b400', // borda visível nos outlined buttons
+    borderWidth: 1,
   },
   selectedDateTime: {
     textAlign: 'center',
-    color: '#666',
+    color: '#f5b400', // cor do texto de data/hora selecionada
     marginBottom: 16,
     fontStyle: 'italic',
   },
@@ -322,7 +325,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   selectedButton: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#f5b400', // cor de destaque quando selecionado
+    color: '#000', // texto preto para contraste
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -331,6 +335,8 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 0.48,
+    borderColor: '#f5b400', // para outlined buttons
+    borderWidth: 1,
   },
   pickerModal: {
     backgroundColor: 'white',
@@ -339,5 +345,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
+
 
 export default TaskForm;

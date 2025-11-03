@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { Appbar, Searchbar, FAB, Menu, Chip, ActivityIndicator } from 'react-native-paper';
-import { tasksAPI } from '../services/api';
 import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
+import {tasksAPI} from '../services/api';
 
-export default function TaskScreen({ navigation, route }) {
+export default function TaskScreen({ navigation }) {
   const [tarefas, setTarefas] = useState([]);
   const [tarefasFiltradas, setTarefasFiltradas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ export default function TaskScreen({ navigation, route }) {
       const response = await tasksAPI.getTarefas();
       setTarefas(response.data.tarefas);
     } catch (error) {
-      console.error('Erro ao carregar tarefas:', error);
+      console.error(error);
       Alert.alert('Erro', 'Não foi possível carregar as tarefas');
     } finally {
       setLoading(false);
@@ -40,23 +40,20 @@ export default function TaskScreen({ navigation, route }) {
   const filtrarTarefas = () => {
     let filtradas = tarefas;
 
-    // Filtro de busca
     if (searchQuery) {
-      filtradas = filtradas.filter(tarefa =>
-        tarefa.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tarefa.descricao?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tarefa.materia?.toLowerCase().includes(searchQuery.toLowerCase())
+      filtradas = filtradas.filter(t =>
+        t.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.descricao?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.materia?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Filtro de status
     if (filtroStatus !== 'todos') {
-      filtradas = filtradas.filter(tarefa => tarefa.status === filtroStatus);
+      filtradas = filtradas.filter(t => t.status === filtroStatus);
     }
 
-    // Filtro de prioridade
     if (filtroPrioridade !== 'todos') {
-      filtradas = filtradas.filter(tarefa => tarefa.prioridade === filtroPrioridade);
+      filtradas = filtradas.filter(t => t.prioridade === filtroPrioridade);
     }
 
     setTarefasFiltradas(filtradas);
@@ -68,11 +65,7 @@ export default function TaskScreen({ navigation, route }) {
       'Tem certeza que deseja excluir esta tarefa?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Excluir', 
-          style: 'destructive',
-          onPress: () => excluirTarefa(id)
-        }
+        { text: 'Excluir', style: 'destructive', onPress: () => excluirTarefa(id) }
       ]
     );
   };
@@ -101,7 +94,6 @@ export default function TaskScreen({ navigation, route }) {
         await tasksAPI.criarTarefa(dadosTarefa);
         Alert.alert('Sucesso', 'Tarefa criada com sucesso!');
       }
-      
       setShowForm(false);
       setTarefaEditando(null);
       carregarTarefas();
@@ -138,45 +130,15 @@ export default function TaskScreen({ navigation, route }) {
         <Menu
           visible={menuVisible}
           onDismiss={() => setMenuVisible(false)}
-          anchor={
-            <Appbar.Action 
-              icon="filter-variant" 
-              onPress={() => setMenuVisible(true)} 
-            />
-          }
+          anchor={<Appbar.Action icon="filter-variant" onPress={() => setMenuVisible(true)} />}
         >
-          <Menu.Item 
-            onPress={() => {
-              setFiltroStatus('todos');
-              setMenuVisible(false);
-            }} 
-            title="Todos os status" 
-          />
-          <Menu.Item 
-            onPress={() => {
-              setFiltroStatus('pendente');
-              setMenuVisible(false);
-            }} 
-            title="Apenas pendentes" 
-          />
-          <Menu.Item 
-            onPress={() => {
-              setFiltroStatus('em_andamento');
-              setMenuVisible(false);
-            }} 
-            title="Em andamento" 
-          />
-          <Menu.Item 
-            onPress={() => {
-              setFiltroStatus('concluida');
-              setMenuVisible(false);
-            }} 
-            title="Concluídas" 
-          />
+          <Menu.Item onPress={() => { setFiltroStatus('todos'); setMenuVisible(false); }} title="Todos os status" />
+          <Menu.Item onPress={() => { setFiltroStatus('pendente'); setMenuVisible(false); }} title="Apenas pendentes" />
+          <Menu.Item onPress={() => { setFiltroStatus('em_andamento'); setMenuVisible(false); }} title="Em andamento" />
+          <Menu.Item onPress={() => { setFiltroStatus('concluida'); setMenuVisible(false); }} title="Concluídas" />
         </Menu>
       </Appbar.Header>
 
-      {/* Barra de Pesquisa */}
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Buscar tarefas..."
@@ -186,7 +148,6 @@ export default function TaskScreen({ navigation, route }) {
         />
       </View>
 
-      {/* Filtros Ativos */}
       <View style={styles.filtersContainer}>
         <Chip
           selected={filtroStatus !== 'todos'}
@@ -195,7 +156,7 @@ export default function TaskScreen({ navigation, route }) {
         >
           Status: {filtroStatus === 'todos' ? 'Todos' : filtroStatus}
         </Chip>
-        
+
         <Chip
           selected={filtroPrioridade !== 'todos'}
           onPress={() => setFiltroPrioridade('todos')}
@@ -205,17 +166,12 @@ export default function TaskScreen({ navigation, route }) {
         </Chip>
 
         {(filtroStatus !== 'todos' || filtroPrioridade !== 'todos' || searchQuery) && (
-          <Chip
-            onPress={limparFiltros}
-            style={[styles.chip, styles.clearChip]}
-            icon="close"
-          >
+          <Chip onPress={limparFiltros} style={[styles.chip, styles.clearChip]} icon="close">
             Limpar
           </Chip>
         )}
       </View>
 
-      {/* Lista de Tarefas */}
       <TaskList
         tarefas={tarefasFiltradas}
         loading={loading}
@@ -234,34 +190,11 @@ export default function TaskScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  searchContainer: {
-    padding: 10,
-    backgroundColor: 'white',
-  },
-  searchbar: {
-    elevation: 0,
-  },
-  filtersContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 10,
-    backgroundColor: 'white',
-  },
-  chip: {
-    margin: 2,
-  },
-  clearChip: {
-    backgroundColor: '#ffebee',
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#2196F3',
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  searchContainer: { padding: 10, backgroundColor: 'white' },
+  searchbar: { elevation: 0 },
+  filtersContainer: { flexDirection: 'row', flexWrap: 'wrap', padding: 10, backgroundColor: 'white' },
+  chip: { margin: 2 },
+  clearChip: { backgroundColor: '#ffebee' },
+  fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, backgroundColor: '#f5b400' },
 });

@@ -38,10 +38,10 @@ function MainTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2196F3',
+        tabBarActiveTintColor: '#f5b400',
         tabBarInactiveTintColor: 'gray',
         headerStyle: {
-          backgroundColor: '#2196F3',
+          backgroundColor: '#f5b400',
         },
         headerTintColor: '#fff',
         headerTitleStyle: {

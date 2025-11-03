@@ -54,42 +54,64 @@ const TaskList = ({ tarefas, loading, onEditTask, onDeleteTask, onRefresh }) => 
 };
 
 const styles = StyleSheet.create({
-  list: {
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollView: {
     flex: 1,
   },
-  listContent: {
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+  form: {
+    padding: 16,
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666',
-  },
-  emptyText: {
-    fontSize: 48,
+  input: {
     marginBottom: 16,
+    color: '#000000ff', 
   },
-  emptyTitle: {
-    fontSize: 18,
-    color: '#666',
-    textAlign: 'center',
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#f5b400', 
+  },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
+  dateTimeButton: {
+    flex: 0.48,
+    borderColor: '#f5b400', 
+    borderWidth: 1,
+  },
+  selectedDateTime: {
     textAlign: 'center',
+    color: '#f5b400', 
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  segmented: {
     marginBottom: 16,
   },
-  refreshButton: {
-    marginTop: 8,
+  selectedButton: {
+    backgroundColor: '#f5b400', 
+    color: '#fff', 
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
+  },
+  button: {
+    flex: 0.48,
+    borderColor: '#f5b400', // para outlined buttons
+    borderWidth: 1,
+  },
+  pickerModal: {
+    backgroundColor: 'white',
+    margin: 20,
+    borderRadius: 8,
+    padding: 20,
   },
 });
 
