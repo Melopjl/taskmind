@@ -1,14 +1,13 @@
 const db = require('../config/database');
-const moment = require('moment');
+const { safe, formatDate } = require('../utils/format');
 
 class DashboardController {
   // Dashboard principal
   async getDashboard(req, res) {
     try {
       const usuarioId = req.usuario.id;
-      const mesAtual = moment().format('YYYY-MM');
+      const mesAtual = new Date().toISOString().slice(0, 7); // YYYY-MM
 
-      // Estatísticas de tarefas
       const [tarefasStats] = await db.execute(
         `SELECT 
           COUNT(*) as total,
@@ -22,7 +21,6 @@ class DashboardController {
         [usuarioId]
       );
 
-      // Próximas tarefas
       const [proximasTarefas] = await db.execute(
         `SELECT * FROM tarefas 
          WHERE usuario_id = ? AND data_vencimento >= NOW() AND status != 'concluida'
@@ -31,7 +29,6 @@ class DashboardController {
         [usuarioId]
       );
 
-      // Tarefas atrasadas
       const [tarefasAtrasadas] = await db.execute(
         `SELECT * FROM tarefas 
          WHERE usuario_id = ? AND data_vencimento < NOW() AND status != 'concluida'
@@ -40,7 +37,6 @@ class DashboardController {
         [usuarioId]
       );
 
-      // Próximos eventos
       const [proximosEventos] = await db.execute(
         `SELECT * FROM eventos 
          WHERE usuario_id = ? AND data_inicio >= NOW()
@@ -49,7 +45,6 @@ class DashboardController {
         [usuarioId]
       );
 
-      // Desempenho do mês
       const [desempenho] = await db.execute(
         `SELECT * FROM desempenho 
          WHERE usuario_id = ? AND mes_ano = ?`,
@@ -92,8 +87,8 @@ class DashboardController {
       );
 
       res.json({
-        eventos: eventos,
-        tarefas: tarefas
+        eventos,
+        tarefas
       });
     } catch (error) {
       console.error('Erro ao buscar calendário:', error);
@@ -106,10 +101,22 @@ class DashboardController {
     try {
       const { titulo, descricao, data_inicio, data_fim, tipo, cor, local } = req.body;
 
+      const inicioFormatado = formatDate(data_inicio);
+      const fimFormatado = formatDate(data_fim);
+
       const [result] = await db.execute(
         `INSERT INTO eventos (usuario_id, titulo, descricao, data_inicio, data_fim, tipo, cor, local)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [req.usuario.id, titulo, descricao, data_inicio, data_fim, tipo, cor, local]
+        [
+          safe(req.usuario.id),
+          safe(titulo),
+          safe(descricao),
+          safe(inicioFormatado),
+          safe(fimFormatado),
+          safe(tipo),
+          safe(cor),
+          safe(local)
+        ]
       );
 
       const [eventos] = await db.execute('SELECT * FROM eventos WHERE id = ?', [result.insertId]);
@@ -129,10 +136,8 @@ class DashboardController {
     try {
       const { meses = 6 } = req.query;
       const usuarioId = req.usuario.id;
-      
       const limiteMeses = parseInt(meses) || 6;
-      
-      // Query corrigida: LIMIT não pode usar placeholder
+
       const [desempenho] = await db.execute(
         `SELECT * FROM desempenho 
          WHERE usuario_id = ? 
@@ -141,7 +146,6 @@ class DashboardController {
         [usuarioId]
       );
 
-      // Calcular progresso geral
       const [progresso] = await db.execute(
         `SELECT 
           COUNT(*) as total_tarefas,
