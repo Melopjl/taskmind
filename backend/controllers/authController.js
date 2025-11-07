@@ -22,7 +22,7 @@ class AuthController {
         return res.status(400).json({ error: 'Usuário já existe.' });
       }
 
-      // Converter data do formato DD/MM/YYYY para YYYY-MM-DD
+     
       let dataNascimentoFormatada = null;
       if (data_nascimento && data_nascimento.includes('/')) {
         const [dia, mes, ano] = data_nascimento.split('/');
@@ -30,7 +30,6 @@ class AuthController {
           dataNascimentoFormatada = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
         }
       } else {
-        // Se já estiver no formato correto ou for vazio
         dataNascimentoFormatada = data_nascimento || null;
       }
 
@@ -84,8 +83,7 @@ class AuthController {
       }
 
       const usuario = usuarios[0];
-      
-      // Verificar se a senha hash é válida (não é a fake)
+    
       if (usuario.senha_hash && usuario.senha_hash.includes('examplehash')) {
         return res.status(400).json({ error: 'Use a senha: 123456 para usuários de exemplo' });
       }
@@ -102,7 +100,6 @@ class AuthController {
         { expiresIn: '30d' }
       );
 
-      // Remover senha_hash da resposta
       const { senha_hash, ...usuarioSemSenha } = usuario;
 
       res.json({
@@ -139,12 +136,11 @@ class AuthController {
         [usuario.id, token, dataExpiracao]
       );
 
-      // Aqui você configuraria o nodemailer para enviar o email
       console.log(`Token de recuperação para ${email}: ${token}`);
       
       res.json({ 
         message: 'Email de recuperação enviado!',
-        token: token // Em produção, remover esta linha e enviar apenas por email
+        token: token 
       });
     } catch (error) {
       console.error('Erro na recuperação de senha:', error);
@@ -176,7 +172,7 @@ class AuthController {
         [senhaHash, tokenData.usuario_id]
       );
 
-      // Marcar token como utilizado
+      
       await db.execute(
         'UPDATE redefinicoes_senha SET utilizado = TRUE WHERE id = ?',
         [tokenData.id]
@@ -189,7 +185,7 @@ class AuthController {
     }
   }
 
-  // Criar usuário de teste (para desenvolvimento)
+  // Criar usuário de teste
   async criarUsuarioTeste(req, res) {
     try {
       const salt = await bcrypt.genSalt(10);

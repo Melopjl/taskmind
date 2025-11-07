@@ -1,17 +1,15 @@
-const moment = require('moment');
+import moment from 'moment';
 
-function safe(value) {
-  return value === undefined ? null : value;
+export function isAtrasada(dataVencimento) {
+  if (!dataVencimento) return false;
+
+  const vencimento = moment(dataVencimento, [
+    moment.ISO_8601,
+    'DD/MM/YYYY',
+    'DD/MM/YYYY HH:mm',
+  ]);
+
+  if (!vencimento.isValid()) return false;
+
+  return vencimento.isBefore(moment());
 }
-
-function formatDate(date) {
-  if (!date) return null;
-  return moment(date).format('DD-MM-YYYY HH:mm:ss');
-}
-
-module.exports = {
-  safe,
-  formatDate
-};
-
-//formato data e horas criação de eventos

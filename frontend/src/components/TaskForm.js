@@ -7,11 +7,12 @@ import {
   Text, 
   Appbar,
   Portal,
-  Modal,
-  ActivityIndicator 
+  Modal
 } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import 'moment/locale/pt-br';
+moment.locale('pt-br');
 
 const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
   const [titulo, setTitulo] = useState('');
@@ -22,7 +23,6 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
   const [status, setStatus] = useState('pendente');
   const [nota, setNota] = useState('');
 
-  // DateTime Picker
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -65,17 +65,19 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
       return;
     }
 
+
+    const dataFormatada = moment(dataVencimento).format('YYYY-MM-DD HH:mm:ss');
+
     const dadosTarefa = {
       titulo: titulo.trim(),
       descricao: descricao.trim(),
       materia: materia.trim(),
-      data_vencimento: dataVencimento.toISOString(),
+      data_vencimento: dataFormatada,
       prioridade,
       status,
       cor: prioridade === 'alta' ? '#f44336' : prioridade === 'media' ? '#ff9800' : '#4caf50'
     };
 
-    // Adicionar nota apenas se for concluída e nota for fornecida
     if (status === 'concluida' && nota) {
       dadosTarefa.nota = parseFloat(nota);
     }
@@ -157,24 +159,9 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
             value={prioridade}
             onValueChange={setPrioridade}
             buttons={[
-              { 
-                value: 'baixa', 
-                label: 'Baixa',
-                icon: 'arrow-down',
-                style: prioridade === 'baixa' ? styles.selectedButton : {}
-              },
-              { 
-                value: 'media', 
-                label: 'Média',
-                icon: 'minus',
-                style: prioridade === 'media' ? styles.selectedButton : {}
-              },
-              { 
-                value: 'alta', 
-                label: 'Alta',
-                icon: 'arrow-up',
-                style: prioridade === 'alta' ? styles.selectedButton : {}
-              },
+              { value: 'baixa', label: 'Baixa', icon: 'arrow-down', style: prioridade === 'baixa' ? styles.selectedButton : {} },
+              { value: 'media', label: 'Média', icon: 'minus', style: prioridade === 'media' ? styles.selectedButton : {} },
+              { value: 'alta', label: 'Alta', icon: 'arrow-up', style: prioridade === 'alta' ? styles.selectedButton : {} },
             ]}
             style={styles.segmented}
           />
@@ -184,24 +171,9 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
             value={status}
             onValueChange={setStatus}
             buttons={[
-              { 
-                value: 'pendente', 
-                label: 'Pendente',
-                icon: 'clock-outline',
-                style: status === 'pendente' ? styles.selectedButton : {}
-              },
-              { 
-                value: 'em_andamento', 
-                label: 'Andamento',
-                icon: 'progress-clock',
-                style: status === 'em_andamento' ? styles.selectedButton : {}
-              },
-              { 
-                value: 'concluida', 
-                label: 'Concluída',
-                icon: 'check-circle',
-                style: status === 'concluida' ? styles.selectedButton : {}
-              },
+              { value: 'pendente', label: 'Pendente', icon: 'clock-outline', style: status === 'pendente' ? styles.selectedButton : {} },
+              { value: 'em_andamento', label: 'Andamento', icon: 'progress-clock', style: status === 'em_andamento' ? styles.selectedButton : {} },
+              { value: 'concluida', label: 'Concluída', icon: 'check-circle', style: status === 'concluida' ? styles.selectedButton : {} },
             ]}
             style={styles.segmented}
           />
@@ -241,7 +213,6 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
         </View>
       </ScrollView>
 
-      {/* Date Pickers */}
       <Portal>
         {showDatePicker && (
           <Modal
@@ -256,9 +227,7 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
               onChange={handleDateChange}
               minimumDate={new Date()}
             />
-            <Button onPress={() => setShowDatePicker(false)}>
-              OK
-            </Button>
+            <Button onPress={() => setShowDatePicker(false)}>OK</Button>
           </Modal>
         )}
 
@@ -274,9 +243,7 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
               onChange={handleTimeChange}
             />
-            <Button onPress={() => setShowTimePicker(false)}>
-              OK
-            </Button>
+            <Button onPress={() => setShowTimePicker(false)}>OK</Button>
           </Modal>
         )}
       </Portal>
@@ -285,66 +252,19 @@ const TaskForm = ({ tarefa, onSave, onCancel, loading = false }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  form: {
-    padding: 16,
-  },
-  input: {
-    marginBottom: 16,
-    color: '#f5b400', // texto digitado
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#f5b400', // cor das labels
-  },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  dateTimeButton: {
-    flex: 0.48,
-    borderColor: '#f5b400', // borda visível nos outlined buttons
-    borderWidth: 1,
-  },
-  selectedDateTime: {
-    textAlign: 'center',
-    color: '#f5b400', // cor do texto de data/hora selecionada
-    marginBottom: 16,
-    fontStyle: 'italic',
-  },
-  segmented: {
-    marginBottom: 16,
-  },
-  selectedButton: {
-    backgroundColor: '#f5b400', // cor de destaque quando selecionado
-    color: '#000', // texto preto para contraste
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 24,
-  },
-  button: {
-    flex: 0.48,
-    borderColor: '#f5b400', // para outlined buttons
-    borderWidth: 1,
-  },
-  pickerModal: {
-    backgroundColor: 'white',
-    margin: 20,
-    borderRadius: 8,
-    padding: 20,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  scrollView: { flex: 1 },
+  form: { padding: 16 },
+  input: { marginBottom: 16, color: '#f5b400' },
+  label: { fontSize: 16, fontWeight: 'bold', marginBottom: 8, color: '#f5b400' },
+  dateTimeContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  dateTimeButton: { flex: 0.48, borderColor: '#f5b400', borderWidth: 1 },
+  selectedDateTime: { textAlign: 'center', color: '#f5b400', marginBottom: 16, fontStyle: 'italic' },
+  segmented: { marginBottom: 16 },
+  selectedButton: { backgroundColor: '#f5b400', color: '#000' },
+  buttonsContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 24 },
+  button: { flex: 0.48, borderColor: '#f5b400', borderWidth: 1 },
+  pickerModal: { backgroundColor: 'white', margin: 20, borderRadius: 8, padding: 20 },
 });
-
 
 export default TaskForm;
