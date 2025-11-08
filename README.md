@@ -73,4 +73,46 @@ Edite o arquivo frontend/src/services/api.js para usar o IP da sua máquina:
 ## // Substitua pelo IP da sua máquina
 ## const API_URL = 'http://SEU_IP:3000/api';
 
+## 🗄️ Backend - 
+
+Na pasta backend, crie um arquivo .env:
+```
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=nome_do_banco
+JWT_SECRET=seu_jwt_secret_aqui
+PORT=3000
+## ⚠️ Nota: O arquivo .env não está no repositório, então é necessário criar manualmente.
+```
+
+# 🎯 Dicas
+
+Mantenha sempre o XAMPP rodando com Apache e MySQL ativos.
+
+Se algo não funcionar no Expo Go, abra pelo Android Studio.
+
+Verifique se o IP no api.js está correto para evitar problemas de conexão.
+
+Não feche os terminais do frontend ou backend enquanto estiver testando o projeto.
+
+
+# 🚀 Contribuindo
+
+Fork o projeto
+
+Crie uma branch para a feature (git checkout -b feature/nova-feature)
+
+Faça commit das alterações (git commit -m 'Adiciona nova feature')
+
+Push para a branch (git push origin feature/nova-feature)
+
+Abra um Pull Request
+
+
+## ✨ TaskMind está pronto para rodar no seu computador!
+Siga os passos acima e aproveite o projeto.
+
+
+
 
