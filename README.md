@@ -47,8 +47,38 @@ OBS: NAO FECHE O TERMINAL
 na pasta do frontend dentro de src vai ter uma pasta services e la vai ter um arquivo chamado "api.js" e voce irá apenas em:
 
 
+
 // MUDE PARA SEU IP: http://SEU_IP:3000/api
 
 const API_URL = ' http://808.166.222.30/api';
 
 aqui voce coloca o ip da sua maquina
+
+
+nao vai ter o .env 
+
+na pasta do backend 
+
+crie um arquivo chamado " .env "
+
+
+modelo 
+
+DB_HOST=localhost
+
+DB_USER=root
+
+DB_PASSWORD=
+
+DB_NAME= nome do banco
+
+JWT_SECRET=seu_jwt_secret_aqui
+
+PORT=3000
+
+
+
+
+
+
+
