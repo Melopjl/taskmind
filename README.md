@@ -32,7 +32,7 @@ git clone https://github.com/Melopjl/taskmind.git
 ```
 📦 Instalação das Dependências
 
-🖥️ Frontend -
+## 🖥️ Frontend -
 
 1 - Entre na pasta frontend:
 cd frontend
@@ -49,7 +49,7 @@ Se tiver o Expo Go, escaneie o código.
 
 Se usar Android Studio, mantenha-o aberto e clique em Open Android.
 
-⚡ Backend -
+## ⚡ Backend -
 
 1- Entre na pasta backend:
 cd backend
@@ -59,9 +59,18 @@ npm install
 
 3- Inicie o Servidor:
 node server.js
-
+```
 ⚠️ Não feche este terminal enquanto o backend estiver em execução.
 
+```
 
-⚙️ Configurações
-🖌️ Frontend
+## ⚙️ Configurações
+
+## 🖌️ Frontend - 
+
+Edite o arquivo frontend/src/services/api.js para usar o IP da sua máquina:
+
+## // Substitua pelo IP da sua máquina
+## const API_URL = 'http://SEU_IP:3000/api';
+
+
