@@ -33,6 +33,7 @@ git clone https://github.com/Melopjl/taskmind.git
 📦 Instalação das Dependências
 
 🖥️ Frontend -
+
 1 - Entre na pasta frontend:
 cd frontend
 
@@ -49,6 +50,7 @@ Se tiver o Expo Go, escaneie o código.
 Se usar Android Studio, mantenha-o aberto e clique em Open Android.
 
 ⚡ Backend -
+
 1- Entre na pasta backend:
 cd backend
 
