@@ -12,9 +12,11 @@ Ou usar o aplicativo Expo Go (Tem na play store)
 
 Tem que ter o Xampp instalado
 
+O MYSQL WorkBench
+
 ### DEIXAR O XAMPP LIGADO APACHE E MYSQL!!!
 
-O MYSQL WorkBench
+
 
 ## 📦 Instalação das Dependências
 
