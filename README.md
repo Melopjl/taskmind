@@ -55,7 +55,7 @@ const API_URL = ' http://808.166.222.30/api';
 aqui voce coloca o ip da sua maquina
 
 
-###OBS:
+### OBS:
 nao vai ter o .env 
 
 na pasta do backend 
