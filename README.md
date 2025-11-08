@@ -1,5 +1,10 @@
 # 🧠 TaskMind - Instalação
 
+Ter o Git instalado 
+
+e no terminal do vscode o "Git Bash" 
+
+dar um " git clone https://github.com/Melopjl/taskmind.git "
 
 Duas opções: Ter o Android Studio instalado
 
