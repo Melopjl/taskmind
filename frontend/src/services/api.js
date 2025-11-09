@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // MUDE PARA SEU IP: http://SEU_IP:3000/api
-const API_URL = ' seuip/api';
+const API_URL = 'http://ipdasuamaquina:3000/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -57,18 +57,19 @@ export const tasksAPI = {
 export const userAPI = {
   getPerfil: () => api.get('/usuario/perfil'),
   atualizarPerfil: (dados) => api.put('/usuario/perfil', dados),
-  uploadFoto: (formData) => api.post('/usuario/foto', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  uploadFoto: (formData) =>
+    api.post('/usuario/foto', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  removerFoto: () => api.delete('/usuario/foto'), // ✅ método adicionado
   alterarSenha: (dados) => api.put('/usuario/senha', dados),
 };
 
 // API de Dashboard
 export const dashboardAPI = {
   getDashboard: () => api.get('/dashboard'),
-  getCalendario: (dataInicio, dataFim) => api.get('/dashboard/calendario', {
-    params: { data_inicio: dataInicio, data_fim: dataFim }
-  }),
+  getCalendario: (dataInicio, dataFim) =>
+    api.get('/dashboard/calendario', { params: { data_inicio: dataInicio, data_fim: dataFim } }),
   criarEvento: (dados) => api.post('/dashboard/calendario', dados),
   getDesempenho: (meses = 6) => api.get('/dashboard/desempenho', { params: { meses } }),
 };

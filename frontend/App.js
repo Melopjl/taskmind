@@ -13,6 +13,7 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import CalendarScreen from './src/screens/CalendarioScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 

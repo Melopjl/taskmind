@@ -1,13 +1,12 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Text, ActivityIndicator, Button } from 'react-native-paper';
-import TaskItem from './TaskItem';
+import { Text, ActivityIndicator, Button, Card, IconButton } from 'react-native-paper';
 
 const TaskList = ({ tarefas, loading, onEditTask, onDeleteTask, onRefresh }) => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" animating color="#2196F3" />
         <Text style={styles.loadingText}>Carregando tarefas...</Text>
       </View>
     );
@@ -16,7 +15,7 @@ const TaskList = ({ tarefas, loading, onEditTask, onDeleteTask, onRefresh }) => 
   if (!tarefas || tarefas.length === 0) {
     return (
       <View style={styles.center}>
-        <Text style={styles.emptyText}>📝</Text>
+        <Text style={styles.emptyEmoji}>📝</Text>
         <Text style={styles.emptyTitle}>Nenhuma tarefa encontrada</Text>
         <Text style={styles.emptySubtext}>
           {onRefresh ? 'Puxe para atualizar' : 'Crie sua primeira tarefa!'}
@@ -35,83 +34,115 @@ const TaskList = ({ tarefas, loading, onEditTask, onDeleteTask, onRefresh }) => 
     );
   }
 
+  const renderItem = ({ item }) => (
+    <Card style={[styles.card, { borderLeftColor: item.cor || '#2196F3' }]}>
+      <Card.Title 
+        title={item.titulo}
+        subtitle={`${item.materia || 'Sem matéria'} • ${item.prioridade || 'Média'}`}
+        right={(props) => (
+          <View style={{ flexDirection: 'row' }}>
+            <IconButton
+              {...props}
+              icon="pencil"
+              onPress={() => onEditTask && onEditTask(item)}
+            />
+            <IconButton
+              {...props}
+              icon="delete"
+              onPress={() => onDeleteTask && onDeleteTask(item.id)}
+            />
+          </View>
+        )}
+      />
+      {item.descricao ? (
+        <Card.Content>
+          <Text style={styles.descricao}>{item.descricao}</Text>
+        </Card.Content>
+      ) : null}
+      <View style={styles.footer}>
+        <Text style={styles.date}>
+          {item.data_vencimento ? `📅 ${item.data_vencimento}` : ''}
+        </Text>
+        {item.status === 'concluida' && (
+          <Text style={styles.done}>✅ Concluída</Text>
+        )}
+      </View>
+    </Card>
+  );
+
   return (
     <FlatList
       data={tarefas}
       keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <TaskItem 
-          tarefa={item} 
-          onEdit={onEditTask}
-          onDelete={onDeleteTask}
-        />
-      )}
+      renderItem={renderItem}
       style={styles.list}
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
+      refreshing={false}
+      onRefresh={onRefresh}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  list: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  listContent: {
+    padding: 12,
+    paddingBottom: 40,
+  },
+  card: {
+    borderLeftWidth: 5,
+    marginBottom: 10,
+    borderRadius: 10,
     backgroundColor: '#fff',
   },
-  scrollView: {
-    flex: 1,
+  descricao: {
+    color: '#333',
+    marginBottom: 8,
   },
-  form: {
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  date: {
+    color: '#666',
+    fontSize: 12,
+  },
+  done: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 16,
   },
-  input: {
-    marginBottom: 16,
-    color: '#000000ff', 
+  loadingText: {
+    marginTop: 10,
+    color: '#555',
   },
-  label: {
-    fontSize: 16,
+  emptyEmoji: {
+    fontSize: 40,
+  },
+  emptyTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#f5b400', 
+    marginTop: 10,
   },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+  emptySubtext: {
+    fontSize: 14,
+    color: '#777',
+    marginTop: 4,
   },
-  dateTimeButton: {
-    flex: 0.48,
-    borderColor: '#f5b400', 
-    borderWidth: 1,
-  },
-  selectedDateTime: {
-    textAlign: 'center',
-    color: '#f5b400', 
-    marginBottom: 16,
-    fontStyle: 'italic',
-  },
-  segmented: {
-    marginBottom: 16,
-  },
-  selectedButton: {
-    backgroundColor: '#f5b400', 
-    color: '#fff', 
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 24,
-  },
-  button: {
-    flex: 0.48,
-    borderColor: '#f5b400', // para outlined buttons
-    borderWidth: 1,
-  },
-  pickerModal: {
-    backgroundColor: 'white',
-    margin: 20,
-    borderRadius: 8,
-    padding: 20,
+  refreshButton: {
+    marginTop: 16,
   },
 });
 

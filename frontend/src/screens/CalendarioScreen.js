@@ -1,407 +1,296 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { Card, Title, Text, Button, FAB, Portal, Modal, TextInput, SegmentedButtons } from 'react-native-paper';
-import { dashboardAPI } from '../services/api';
-import moment from 'moment';
+import React, { useState } from 'react';
+import { View, Text, Modal, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function CalendarScreen() {
-  const [events, setEvents] = useState({});
-  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
-  const [showEventModal, setShowEventModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+export default function CalendarioScreen() {
+  const [selectedDate, setSelectedDate] = useState('');
+  const [events, setEvents] = useState([
+    { id: '1', date: '2025-11-08', title: 'Reunião com equipe', desc: 'Discutir metas do mês', prioridade: 'alta' },
+    { id: '2', date: '2025-11-09', title: 'Entrega de projeto', desc: 'Prazo final da sprint', prioridade: 'média' },
+  ]);
 
-  // Novo evento
-  const [novoEvento, setNovoEvento] = useState({
-    titulo: '',
-    descricao: '',
-    data_inicio: '',
-    data_fim: '',
-    tipo: 'evento',
-    local: ''
-  });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
 
-  useEffect(() => {
-    carregarCalendario();
-  }, []);
-
-  const carregarCalendario = async () => {
-    try {
-      setLoading(true);
-      const dataInicio = moment().startOf('month').format('YYYY-MM-DD');
-      const dataFim = moment().add(2, 'months').endOf('month').format('YYYY-MM-DD');
-      
-      const response = await dashboardAPI.getCalendario(dataInicio, dataFim);
-      
-      
-      const eventosProcessados = {};
-      
-      // Processar eventos
-      response.data.eventos.forEach(evento => {
-        const data = moment(evento.data_inicio).format('YYYY-MM-DD');
-        if (!eventosProcessados[data]) {
-          eventosProcessados[data] = { marked: true, dots: [] };
-        }
-        
-        eventosProcessados[data].dots.push({
-          color: getEventColor(evento.tipo),
-          key: `evento-${evento.id}`
-        });
-      });
-      
-      // Processar tarefas
-      response.data.tarefas.forEach(tarefa => {
-        const data = moment(tarefa.data_vencimento).format('YYYY-MM-DD');
-        if (!eventosProcessados[data]) {
-          eventosProcessados[data] = { marked: true, dots: [] };
-        }
-        
-        eventosProcessados[data].dots.push({
-          color: getTaskColor(tarefa.prioridade, tarefa.status),
-          key: `tarefa-${tarefa.id}`
-        });
-      });
-      
-      setEvents(eventosProcessados);
-    } catch (error) {
-      console.error('Erro ao carregar calendário:', error);
-      Alert.alert('Erro', 'Não foi possível carregar o calendário');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getEventColor = (tipo) => {
-    switch (tipo) {
-      case 'prova': return '#f44336';
-      case 'aula': return '#2196f3';
-      case 'trabalho': return '#ff9800';
-      case 'evento': return '#4caf50';
-      default: return '#9e9e9e';
-    }
-  };
-
-  const getTaskColor = (prioridade, status) => {
-    if (status === 'concluida') return '#4caf50';
-    
-    switch (prioridade) {
-      case 'alta': return '#f44336';
-      case 'media': return '#ff9800';
-      case 'baixa': return '#2196f3';
-      default: return '#9e9e9e';
-    }
-  };
+  const [newTitle, setNewTitle] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [newPrioridade, setNewPrioridade] = useState('baixa');
 
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
   };
 
-  const handleCreateEvent = async () => {
-    if (!novoEvento.titulo || !novoEvento.data_inicio) {
-      Alert.alert('Erro', 'Preencha pelo menos o título e data de início');
-      return;
-    }
+  const handleAddPress = () => {
+    setEditingEvent(null);
+    setNewTitle('');
+    setNewDesc('');
+    setNewPrioridade('baixa');
+    setModalVisible(true);
+  };
 
-    try {
-      setLoading(true);
-      await dashboardAPI.criarEvento(novoEvento);
-      
-      setShowEventModal(false);
-      setNovoEvento({
-        titulo: '',
-        descricao: '',
-        data_inicio: '',
-        data_fim: '',
-        tipo: 'evento',
-        local: ''
-      });
-      
-      carregarCalendario();
-      Alert.alert('Sucesso', 'Evento criado com sucesso!');
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível criar o evento');
-    } finally {
-      setLoading(false);
+  const handleSave = () => {
+    if (editingEvent) {
+      setEvents(events.map(e =>
+        e.id === editingEvent.id
+          ? { ...e, title: newTitle, desc: newDesc, prioridade: newPrioridade }
+          : e
+      ));
+    } else {
+      const novo = {
+        id: Date.now().toString(),
+        date: selectedDate,
+        title: newTitle,
+        desc: newDesc,
+        prioridade: newPrioridade,
+      };
+      setEvents([...events, novo]);
+    }
+    setModalVisible(false);
+  };
+
+  const handleEdit = (item) => {
+    setEditingEvent(item);
+    setNewTitle(item.title);
+    setNewDesc(item.desc);
+    setNewPrioridade(item.prioridade);
+    setModalVisible(true);
+  };
+
+  const handleDelete = (item) => {
+    setEvents(events.filter(e => e.id !== item.id));
+  };
+
+  const getColorByPriority = (p) => {
+    switch (p) {
+      case 'alta': return '#e53935';
+      case 'média': return '#f5b400';
+      case 'baixa': return '#4caf50';
+      default: return '#2196f3';
     }
   };
 
-  const getEventsForSelectedDate = () => {
-    // Em uma implementação real, você buscaria os eventos específicos da data
-    return [
-      {
-        id: 1,
-        titulo: 'Evento de Exemplo',
-        tipo: 'evento',
-        data_inicio: `${selectedDate} 10:00:00`,
-        local: 'Sala 101'
-      }
-    ];
-  };
+  const markedDates = events.reduce((acc, event) => {
+    acc[event.date] = {
+      marked: true,
+      dotColor: getColorByPriority(event.prioridade),
+    };
+    return acc;
+  }, {});
+
+  const eventsOfDay = events.filter(e => e.date === selectedDate);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <Calendar
-        markedDates={events}
         onDayPress={handleDayPress}
-        monthFormat={'MMMM yyyy'}
-        hideArrows={false}
-        firstDay={1}
-        hideDayNames={false}
-        showWeekNumbers={false}
-        onPressArrowLeft={subtractMonth => subtractMonth()}
-        onPressArrowRight={addMonth => addMonth()}
-        enableSwipeMonths={true}
+        markedDates={{
+          ...markedDates,
+          [selectedDate]: {
+            selected: true,
+            selectedColor: '#f5b400',
+            marked: true,
+          },
+        }}
         theme={{
-          backgroundColor: '#ffffff',
-          calendarBackground: '#ffffff',
-          textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#f5b400',
-          selectedDayTextColor: '#ffffff',
           todayTextColor: '#f5b400',
-          dayTextColor: '#2d4150',
-          textDisabledColor: '#d9e1e8',
-          dotColor: '#f5b400',
-          selectedDotColor: '#ffffff',
           arrowColor: '#f5b400',
-          monthTextColor: '#f5b400',
-          indicatorColor: '#f5b400',
-          textDayFontWeight: '300',
-          textMonthFontWeight: 'bold',
-          textDayHeaderFontWeight: '300',
-          textDayFontSize: 16,
-          textMonthFontSize: 16,
-          textDayHeaderFontSize: 16
+          selectedDayBackgroundColor: '#f5b400',
         }}
       />
 
-      {/* Eventos do Dia Selecionado */}
-      <Card style={styles.eventsCard}>
-        <Card.Content>
-          <Title style={styles.eventsTitle}>
-            Eventos - {moment(selectedDate).format('DD/MM/YYYY')}
-          </Title>
-          
-          <ScrollView style={styles.eventsList}>
-            {getEventsForSelectedDate().length > 0 ? (
-              getEventsForSelectedDate().map(evento => (
-                <View key={evento.id} style={styles.eventItem}>
-                  <View style={[styles.eventDot, { backgroundColor: getEventColor(evento.tipo) }]} />
-                  <View style={styles.eventContent}>
-                    <Text style={styles.eventTitle}>{evento.titulo}</Text>
-                    <Text style={styles.eventTime}>
-                      {moment(evento.data_inicio).format('HH:mm')}
-                      {evento.local && ` • ${evento.local}`}
-                    </Text>
-                  </View>
+      <View style={{ padding: 15, flex: 1 }}>
+        {eventsOfDay.length === 0 ? (
+          <Text style={{ textAlign: 'center', color: 'gray', marginTop: 20 }}>Nenhum evento neste dia.</Text>
+        ) : (
+          <FlatList
+            data={eventsOfDay}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.eventCard}>
+                <View style={[styles.priorityDot, { backgroundColor: getColorByPriority(item.prioridade) }]} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.eventTitle}>{item.title}</Text>
+                  <Text style={styles.eventDesc}>{item.desc}</Text>
+                  <Text style={styles.priorityLabel}>Prioridade: {item.prioridade}</Text>
                 </View>
-              ))
-            ) : (
-              <Text style={styles.noEventsText}>Nenhum evento para esta data</Text>
+                <TouchableOpacity onPress={() => handleEdit(item)}>
+                  <Ionicons name="pencil" size={20} color="#555" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(item)}>
+                  <Ionicons name="trash" size={20} color="#e53935" style={{ marginLeft: 10 }} />
+                </TouchableOpacity>
+              </View>
             )}
-          </ScrollView>
-        </Card.Content>
-      </Card>
-
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => setShowEventModal(true)}
-        label="Novo Evento"
-      />
-
-      {/* Modal Novo Evento */}
-<Portal>
-  <Modal
-    visible={showEventModal}
-    onDismiss={() => setShowEventModal(false)}
-    contentContainerStyle={styles.modal}
-  >
-    <ScrollView>
-      <Card>
-        <Card.Content>
-          <Title style={styles.modalTitle}>Criar Novo Evento</Title>
-          
-          <TextInput
-            label="Título do Evento *"
-            value={novoEvento.titulo}
-            onChangeText={text => setNovoEvento({...novoEvento, titulo: text})}
-            style={styles.input}
-            mode="outlined"
-            theme={{ colors: { primary: '#f5b400' } }}
           />
+        )}
+      </View>
 
-          <TextInput
-            label="Descrição"
-            value={novoEvento.descricao}
-            onChangeText={text => setNovoEvento({...novoEvento, descricao: text})}
-            style={styles.input}
-            mode="outlined"
-            multiline
-            theme={{ colors: { primary: '#f5b400' } }}
-          />
+      {/* BOTÃO FLUTUANTE */}
+      {selectedDate !== '' && (
+        <TouchableOpacity style={styles.fab} onPress={handleAddPress}>
+          <Ionicons name="add" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
 
-          <Text style={styles.label}>Tipo de Evento</Text>
-          <SegmentedButtons
-            value={novoEvento.tipo}
-            onValueChange={value => setNovoEvento({...novoEvento, tipo: value})}
-            buttons={[
-              { value: 'aula', label: 'Aula', icon: 'school' },
-              { value: 'prova', label: 'Prova', icon: 'file-document' },
-              { value: 'trabalho', label: 'Trabalho', icon: 'briefcase' },
-              { value: 'evento', label: 'Evento', icon: 'calendar' },
-            ]}
-            style={styles.segmented}
-          />
+      {/* MODAL DE ADIÇÃO/EDIÇÃO */}
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{editingEvent ? 'Editar Evento' : 'Novo Evento'}</Text>
 
-          <TextInput
-            label="Data de Início *"
-            value={novoEvento.data_inicio}
-            onChangeText={text => setNovoEvento({...novoEvento, data_inicio: text})}
-            style={styles.input}
-            mode="outlined"
-            placeholder="YYYY-MM-DD HH:MM:SS"
-            theme={{ colors: { primary: '#f5b400' } }}
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Título"
+              value={newTitle}
+              onChangeText={setNewTitle}
+            />
+            <TextInput
+              style={[styles.input, { height: 80 }]}
+              placeholder="Descrição"
+              multiline
+              value={newDesc}
+              onChangeText={setNewDesc}
+            />
 
-          <TextInput
-            label="Data de Fim"
-            value={novoEvento.data_fim}
-            onChangeText={text => setNovoEvento({...novoEvento, data_fim: text})}
-            style={styles.input}
-            mode="outlined"
-            placeholder="YYYY-MM-DD HH:MM:SS"
-            theme={{ colors: { primary: '#f5b400' } }}
-          />
+            <Text style={styles.label}>Prioridade:</Text>
+            <View style={styles.priorityRow}>
+              {['baixa', 'média', 'alta'].map((p) => (
+                <TouchableOpacity
+                  key={p}
+                  style={[
+                    styles.priorityBtn,
+                    {
+                      backgroundColor: newPrioridade === p ? getColorByPriority(p) : '#eee',
+                    },
+                  ]}
+                  onPress={() => setNewPrioridade(p)}
+                >
+                  <Text style={{ color: newPrioridade === p ? '#fff' : '#333', fontWeight: 'bold' }}>{p}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-          <TextInput
-            label="Local"
-            value={novoEvento.local}
-            onChangeText={text => setNovoEvento({...novoEvento, local: text})}
-            style={styles.input}
-            mode="outlined"
-            theme={{ colors: { primary: '#f5b400' } }}
-          />
-
-          <View style={styles.modalButtons}>
-            <Button
-              mode="outlined"
-              onPress={() => setShowEventModal(false)}
-              style={[styles.modalButton, styles.modalButtonOutlined]}
-              textColor="#f5b400"
-            >
-              Cancelar
-            </Button>
-            <Button
-              mode="contained"
-              onPress={handleCreateEvent}
-              loading={loading}
-              disabled={loading}
-              style={[styles.modalButton, styles.modalButtonContained]}
-              textColor="#000"
-            >
-              Criar Evento
-            </Button>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+                <Ionicons name="checkmark" size={20} color="#fff" />
+                <Text style={styles.btnText}>Salvar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={20} color="#fff" />
+                <Text style={styles.btnText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </Card.Content>
-      </Card>
-    </ScrollView>
-  </Modal>
-</Portal>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  eventsCard: {
-    margin: 10,
-    flex: 1,
-  },
-  eventsTitle: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  eventsList: {
-    maxHeight: 200,
-  },
-  eventItem: {
+  eventCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    backgroundColor: '#fafafa',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#f5b400',
   },
-  eventDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 10,
-  },
-  eventContent: {
-    flex: 1,
+  priorityDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
   },
   eventTitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
+    fontSize: 15,
+    color: '#333',
   },
-  eventTime: {
+  eventDesc: {
+    color: '#555',
+    fontSize: 13,
+  },
+  priorityLabel: {
+    color: '#777',
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
-  },
-  noEventsText: {
-    textAlign: 'center',
-    color: '#999',
-    fontStyle: 'italic',
-    paddingVertical: 20,
+    marginTop: 3,
   },
   fab: {
     position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
+    right: 20,
+    bottom: 30,
     backgroundColor: '#f5b400',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
   },
-  modal: {
-    margin: 20,
-    maxHeight: '80%',
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 20,
-    borderColor: '#f5b400',
-    borderWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
   },
   input: {
-    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
   },
   label: {
-    fontSize: 16,
+    marginBottom: 5,
     fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#f5b400',
   },
-  segmented: {
+  priorityRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     marginBottom: 15,
+  },
+  priorityBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 8,
   },
   modalButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 15,
+    justifyContent: 'space-around',
   },
-  modalButton: {
-    flex: 0.48,
+  saveBtn: {
+    backgroundColor: '#4caf50',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
   },
-  modalButtonOutlined: {
-    borderColor: '#f5b400',
+  cancelBtn: {
+    backgroundColor: '#999',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
   },
-  modalButtonContained: {
-    backgroundColor: '#f5b400',
-  },
-  modalTitle: {
-    color: '#f5b400',
-    marginBottom: 10,
+  btnText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
 });

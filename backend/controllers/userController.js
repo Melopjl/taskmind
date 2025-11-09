@@ -14,9 +14,8 @@ class UserController {
         [req.usuario.id]
       );
 
-      if (usuarios.length === 0) {
+      if (usuarios.length === 0)
         return res.status(404).json({ error: 'Usuário não encontrado.' });
-      }
 
       const usuario = usuarios[0];
 
@@ -35,28 +34,22 @@ class UserController {
   // Upload de foto de perfil
   async uploadFoto(req, res) {
     try {
-      if (!req.file) {
-        return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
-      }
+      if (!req.file) return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
 
       const filename = req.file.filename;
       const fotoUrl = `/uploads/avatars/${filename}`;
 
+      // Verificar e excluir foto antiga
       const [usuarios] = await db.execute(
         'SELECT foto_perfil FROM usuarios WHERE id = ?',
         [req.usuario.id]
       );
 
-      const fotoAntiga = usuarios[0].foto_perfil;
-
+      const fotoAntiga = usuarios[0]?.foto_perfil;
       if (fotoAntiga) {
-        try {
-          const filenameAntigo = path.basename(fotoAntiga);
-          const caminhoAntigo = path.join(__dirname, '..', 'uploads', 'avatars', filenameAntigo);
-          if (fs.existsSync(caminhoAntigo)) fs.unlinkSync(caminhoAntigo);
-        } catch (deleteError) {
-          console.error('Erro ao deletar foto antiga:', deleteError);
-        }
+        const filenameAntigo = path.basename(fotoAntiga);
+        const caminhoAntigo = path.join(__dirname, '..', 'uploads', 'avatars', filenameAntigo);
+        if (fs.existsSync(caminhoAntigo)) fs.unlinkSync(caminhoAntigo);
       }
 
       await db.execute(
@@ -64,15 +57,35 @@ class UserController {
         [fotoUrl, req.usuario.id]
       );
 
-      res.json({ message: 'Foto de perfil atualizada com sucesso!', foto_perfil: fotoUrl });
+      res.json({ message: 'Foto atualizada com sucesso!', foto_perfil: fotoUrl });
     } catch (error) {
       console.error('Erro ao fazer upload da foto:', error);
+      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+  }
 
-      if (req.file) {
-        try { fs.unlinkSync(req.file.path); } 
-        catch (unlinkError) { console.error('Erro ao deletar arquivo temporário:', unlinkError); }
-      }
+  // 🧹 Remover foto de perfil
+  async removerFoto(req, res) {
+    try {
+      const [usuarios] = await db.execute(
+        'SELECT foto_perfil FROM usuarios WHERE id = ?',
+        [req.usuario.id]
+      );
 
+      const fotoAtual = usuarios[0]?.foto_perfil;
+      if (!fotoAtual) return res.status(400).json({ error: 'Nenhuma foto para remover.' });
+
+      const filename = path.basename(fotoAtual);
+      const caminhoFoto = path.join(__dirname, '..', 'uploads', 'avatars', filename);
+
+      if (fs.existsSync(caminhoFoto)) fs.unlinkSync(caminhoFoto);
+
+      await db.execute('UPDATE usuarios SET foto_perfil = NULL WHERE id = ?', [req.usuario.id]);
+
+      res.json({ message: 'Foto removida com sucesso!' });
+    } catch (error) {
+      console.error('Erro ao remover foto:', error);
       res.status(500).json({ error: 'Erro interno do servidor.' });
     }
   }
@@ -81,12 +94,9 @@ class UserController {
   async atualizarPerfil(req, res) {
     try {
       const { nome, curso, semestre, data_nascimento, telefone } = req.body;
-
-      // Converter data para 'YYYY-MM-DD' para MySQL
-      let dataNascimentoFormatada = null;
-      if (data_nascimento) {
-        dataNascimentoFormatada = moment(data_nascimento).format('YYYY-MM-DD');
-      }
+      const dataNascimentoFormatada = data_nascimento
+        ? moment(data_nascimento).format('YYYY-MM-DD')
+        : null;
 
       await db.execute(
         `UPDATE usuarios 
@@ -141,7 +151,7 @@ class UserController {
     }
   }
 
-  // Servir avatares com fallback
+  // Servir avatares
   async getAvatar(req, res) {
     try {
       const { filename } = req.params;
@@ -155,7 +165,7 @@ class UserController {
       return res.status(404).json({ error: 'Avatar não encontrado' });
     } catch (error) {
       console.error('Erro ao servir avatar:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
+      res.status(500).json({ error: 'Erro interno do servidor.' });
     }
   }
 }

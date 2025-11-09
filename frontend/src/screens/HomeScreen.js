@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, Alert } from 'react-native';
 import { Card, Title, Text, Button, FAB, ActivityIndicator, Chip } from 'react-native-paper';
+import { TouchableOpacity as RNTouchableOpacity } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { dashboardAPI } from '../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,9 +21,7 @@ export default function HomeScreen({ navigation }) {
     try {
       setLoading(true);
       const usuarioData = await AsyncStorage.getItem('@usuario');
-      if (usuarioData) {
-        setUsuario(JSON.parse(usuarioData));
-      }
+      if (usuarioData) setUsuario(JSON.parse(usuarioData));
 
       const response = await dashboardAPI.getDashboard();
       setDashboard(response.data);
@@ -44,15 +45,6 @@ export default function HomeScreen({ navigation }) {
     return total > 0 ? (concluidas / total) * 100 : 0;
   };
 
-  const formatarData = (dataString) => {
-    return new Date(dataString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   if (loading) {
     return (
       <View style={styles.center}>
@@ -69,7 +61,7 @@ export default function HomeScreen({ navigation }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#f5b400']} />
         }
       >
-        {/* Header Boas-vindas */}
+        {/*Boas-vindas */}
         <Card style={styles.welcomeCard}>
           <Card.Content>
             <Title style={styles.welcomeTitle}>
@@ -108,134 +100,45 @@ export default function HomeScreen({ navigation }) {
           </Card.Content>
         </Card>
 
-        {/* Tarefas Atrasadas */}
-        {dashboard?.tarefas_atrasadas?.length > 0 && (
-          <Card style={[styles.sectionCard, styles.urgentCard]}>
-            <Card.Content>
-              <View style={styles.sectionHeader}>
-                <Title style={styles.sectionTitle}>⚠️ Tarefas Atrasadas</Title>
-                <Chip mode="outlined" style={styles.urgentChip} textStyle={{ color: '#fff' }}>
-                  {dashboard.tarefas_atrasadas.length}
-                </Chip>
-              </View>
+        <View style={styles.shortcutsContainer}>
+          {/* Botão de Tarefas */}
+          <RNTouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('Tasks')}
+            style={styles.shortcutWrapper}
+          >
+            <LinearGradient
+              colors={['#f5b400', '#ffcc33']}
+              start={[0, 0]}
+              end={[1, 1]}
+              style={styles.shortcutCard}
+            >
+              <MaterialCommunityIcons name="check-circle-outline" size={34} color="#000" />
+              <Text style={styles.shortcutTitle}>Tarefas</Text>
+              <Text style={styles.shortcutSubtitle}>Ver e gerenciar tarefas</Text>
+            </LinearGradient>
+          </RNTouchableOpacity>
 
-              {dashboard.tarefas_atrasadas.slice(0, 3).map((tarefa) => (
-                <View key={tarefa.id} style={styles.taskItem}>
-                  <Text style={styles.taskTitle}>{tarefa.titulo}</Text>
-                  <Text style={styles.taskDate}>
-                    Venceu: {formatarData(tarefa.data_vencimento)}
-                  </Text>
-                </View>
-              ))}
-
-              <Button
-                mode="outlined"
-                onPress={() => navigation.navigate('Tasks', { filtro: 'atrasadas' })}
-                style={styles.verTudoButton}
-                textColor="#000"
-                outlineColor="#f5b400"
-              >
-                Ver Todas
-              </Button>
-            </Card.Content>
-          </Card>
-        )}
-
-        {/* Próximas Tarefas */}
-        <Card style={styles.sectionCard}>
-          <Card.Content>
-            <View style={styles.sectionHeader}>
-              <Title style={styles.sectionTitle}>📅 Próximas Tarefas</Title>
-              <Button
-                mode="text"
-                onPress={() => navigation.navigate('Tasks')}
-                compact
-                textColor="#f5b400"
-              >
-                Ver Todas
-              </Button>
-            </View>
-
-            {dashboard?.proximas_tarefas?.length > 0 ? (
-              dashboard.proximas_tarefas.slice(0, 5).map((tarefa) => (
-                <View key={tarefa.id} style={styles.taskItem}>
-                  <View style={styles.taskHeader}>
-                    <Text style={styles.taskTitle}>{tarefa.titulo}</Text>
-                    <Chip
-                      mode="flat"
-                      style={[
-                        styles.priorityChip,
-                        {
-                          backgroundColor:
-                            tarefa.prioridade === 'alta'
-                              ? '#f44336'
-                              : tarefa.prioridade === 'media'
-                              ? '#f5b400'
-                              : '#4caf50',
-                        },
-                      ]}
-                      textStyle={{ color: '#fff', fontSize: 10 }}
-                    >
-                      {tarefa.prioridade}
-                    </Chip>
-                  </View>
-                  <Text style={styles.taskDate}>{formatarData(tarefa.data_vencimento)}</Text>
-                  {tarefa.materia && (
-                    <Text style={styles.taskMateria}>{tarefa.materia}</Text>
-                  )}
-                </View>
-              ))
-            ) : (
-              <Text style={styles.emptyText}>Nenhuma tarefa próxima</Text>
-            )}
-          </Card.Content>
-        </Card>
-
-        {/* Próximos Eventos */}
-        <Card style={styles.sectionCard}>
-          <Card.Content>
-            <View style={styles.sectionHeader}>
-              <Title style={styles.sectionTitle}>🗓️ Próximos Eventos</Title>
-              <Button
-                mode="text"
-                onPress={() => navigation.navigate('Calendar')}
-                compact
-                textColor="#f5b400"
-              >
-                Ver Calendário
-              </Button>
-            </View>
-
-            {dashboard?.proximos_eventos?.length > 0 ? (
-              dashboard.proximos_eventos.slice(0, 3).map((evento) => (
-                <View key={evento.id} style={styles.eventItem}>
-                  <View style={styles.eventIcon}>
-                    <Text>
-                      {evento.tipo === 'prova'
-                        ? '📝'
-                        : evento.tipo === 'aula'
-                        ? '📚'
-                        : evento.tipo === 'trabalho'
-                        ? '📋'
-                        : '📅'}
-                    </Text>
-                  </View>
-                  <View style={styles.eventContent}>
-                    <Text style={styles.eventTitle}>{evento.titulo}</Text>
-                    <Text style={styles.eventDate}>
-                      {formatarData(evento.data_inicio)}
-                    </Text>
-                    {evento.local && (
-                      <Text style={styles.eventLocal}>📍 {evento.local}</Text>
-                    )}
-                  </View>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.emptyText}>Nenhum evento próximo</Text>
-            )}
-          </Card.Content>
-        </Card>
+          {/* Botão de Eventos */}
+          <RNTouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('Calendar')}
+            style={styles.shortcutWrapper}
+          >
+            <LinearGradient
+              colors={['#4caf50', '#81c784']}
+              start={[0, 0]}
+              end={[1, 1]}
+              style={styles.shortcutCard}
+            >
+              <MaterialCommunityIcons name="calendar-month" size={34} color="#fff" />
+              <Text style={[styles.shortcutTitle, { color: '#fff' }]}>Calendário</Text>
+              <Text style={[styles.shortcutSubtitle, { color: '#f0f0f0' }]}>
+                Próximos eventos e provas
+              </Text>
+            </LinearGradient>
+          </RNTouchableOpacity>
+        </View>
 
         {/* Desempenho */}
         {dashboard?.desempenho_mensal && (
@@ -253,53 +156,10 @@ export default function HomeScreen({ navigation }) {
                   {getProgresso().toFixed(0)}% concluído
                 </Text>
               </View>
-
-              <View style={styles.performanceStats}>
-                <View style={styles.performanceItem}>
-                  <Text style={styles.performanceValue}>
-                    {dashboard.desempenho_mensal.tarefas_concluidas}
-                  </Text>
-                  <Text style={styles.performanceLabel}>Concluídas</Text>
-                </View>
-
-                {dashboard.desempenho_mensal.media_notas > 0 && (
-                  <View style={styles.performanceItem}>
-                    <Text style={styles.performanceValue}>
-                      {dashboard.desempenho_mensal.media_notas.toFixed(1)}
-                    </Text>
-                    <Text style={styles.performanceLabel}>Média</Text>
-                  </View>
-                )}
-
-                <View style={styles.performanceItem}>
-                  <Text style={styles.performanceValue}>
-                    {dashboard.desempenho_mensal.tempo_estudo_minutos}
-                  </Text>
-                  <Text style={styles.performanceLabel}>Min. estudo</Text>
-                </View>
-              </View>
-
-              <Button
-                mode="outlined"
-                onPress={() => navigation.navigate('Dashboard')}
-                style={styles.verDetalhesButton}
-                outlineColor="#f5b400"
-                textColor="#000"
-              >
-                Ver Detalhes
-              </Button>
             </Card.Content>
           </Card>
         )}
       </ScrollView>
-
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => navigation.navigate('TaskForm')}
-        label="Nova Tarefa"
-        color="#000"
-      />
     </View>
   );
 }
@@ -346,137 +206,62 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  statSuccess: {
-    color: '#4CAF50',
+  statSuccess: { color: '#4CAF50' },
+  statWarning: { color: '#f5b400' },
+  statDanger: { color: '#f44336' },
+  statLabel: { color: '#333', fontSize: 12 },
+
+  shortcutsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 15,
+    paddingHorizontal: 10,
   },
-  statWarning: {
-    color: '#f5b400',
+  shortcutWrapper: {
+    flex: 1,
+    marginHorizontal: 5,
   },
-  statDanger: {
-    color: '#f44336',
+  shortcutCard: {
+    borderRadius: 18,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
   },
-  statLabel: {
-    color: '#333',
+  shortcutTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
+    marginTop: 8,
+  },
+  shortcutSubtitle: {
     fontSize: 12,
+    color: '#222',
+    marginTop: 3,
   },
+
   sectionCard: {
     margin: 10,
     borderRadius: 16,
     backgroundColor: '#fff',
-  },
-  urgentCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#f44336',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#000',
   },
-  urgentChip: {
-    backgroundColor: '#f44336',
-  },
-  taskItem: {
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  taskHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  taskTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    flex: 1,
-  },
-  taskDate: {
-    fontSize: 12,
-    color: '#777',
-  },
-  taskMateria: {
-    fontSize: 12,
-    color: '#f5b400',
-  },
-  priorityChip: {
-    height: 24,
-    borderRadius: 12,
-  },
-  eventItem: {
-    flexDirection: 'row',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  eventIcon: {
-    marginRight: 12,
-  },
-  eventTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-  },
-  eventDate: {
-    fontSize: 12,
-    color: '#777',
-  },
-  eventLocal: {
-    fontSize: 12,
-    color: '#f5b400',
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#aaa',
-    fontStyle: 'italic',
-    paddingVertical: 15,
-  },
-  progressContainer: {
-    marginVertical: 10,
-  },
+  progressContainer: { marginVertical: 10 },
   progressBar: {
     height: 8,
     backgroundColor: '#e0e0e0',
     borderRadius: 4,
     overflow: 'hidden',
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#f5b400',
-  },
-  progressText: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: '#666',
-  },
-  performanceStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 15,
-  },
-  performanceItem: {
-    alignItems: 'center',
-  },
-  performanceValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#f5b400',
-  },
-  performanceLabel: {
-    fontSize: 12,
-    color: '#666',
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#f5b400',
-  },
+  progressFill: { height: '100%', backgroundColor: '#f5b400' },
+  progressText: { textAlign: 'center', marginTop: 5, color: '#666' },
 });
+
