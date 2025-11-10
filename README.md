@@ -1,33 +1,21 @@
-## Sobre O Projeto
+🧠 Sobre o Projeto
 
-## Objetivo Principal:
-O projeto Task Mind visa desenvolver um aplicativo móvel gratuito e intuitivo especificamente voltado para a organização da vida acadêmica de estudantes. Seu propósito central é ser uma ferramenta digital prática que auxilie os alunos no planejamento, monitoramento e execução de suas tarefas e compromissos diários, combatendo a desorganização que leva a atrasos, esquecimentos e queda na produtividade.
+O Task Mind é um aplicativo móvel gratuito e intuitivo voltado para a organização da vida acadêmica de estudantes.
+Seu objetivo é oferecer uma ferramenta prática para planejar, monitorar e executar tarefas e compromissos, ajudando a combater a desorganização que causa atrasos, esquecimentos e queda na produtividade.
 
-Funcionalidades-Chave para o Estudante:
+O app vai além de uma simples lista de tarefas, reunindo funcionalidades como:
 
-Para atingir esse objetivo, o Task Mind irá além de uma simples lista de tarefas, integrando as seguintes funcionalidades:
+Gestão de tarefas e prazos — criação, edição e exclusão de atividades com título, descrição, disciplina, prioridade e data de entrega.
 
-## Gestão Centralizada de Tarefas e Prazos: 
-Os usuários poderão cadastrar, editar e excluir tarefas, definindo título, descrição, disciplina, prioridade e data de entrega.
+Calendário acadêmico interativo — visualização semanal e mensal de compromissos e prazos.
 
- ## Calendário Acadêmico Interativo: 
- Uma visão integrada do calendário permitirá que o estudante visualize todos os seus prazos (trabalhos, provas, apresentações) de forma semanal ou mensal, facilitando o planejamento de longo prazo.
+Notificações inteligentes — alertas automáticos para lembretes de tarefas próximas.
 
-## Sistema de Lembretes e Notificações Inteligentes: O app enviará notificações automáticas para alertar o usuário sobre prazos próximos, ajudando na gestão do tempo e prevenindo esquecimentos.
+Personalização do perfil — organização por disciplinas, cursos ou semestres.
 
-## Personalização do Perfil: 
-O estudante poderá customizar sua experiência, organizando as tarefas por disciplinas, cursos ou semestres, tornando o aplicativo adaptável à sua rotina específica.
+Segurança e conformidade com a LGPD — garantindo a proteção dos dados do usuário.
 
-## Conformidade e Segurança: 
-O projeto prioriza a segurança dos dados do usuário, assegurando que o sistema esteja em conformidade com a LGPD (Lei Geral de Proteção de Dados) e com os padrões de segurança da informação.
-
-## Em Resumo:
-
-O Task Mind se propõe a ser mais do que um app; é uma solução tecnológica integrada que reúne todas as informações acadêmicas em um único local de fácil acesso. Ao unir uma interface amigável a funcionalidades poderosas como um calendário interativo e notificações proativas, o aplicativo busca empoderar os estudantes, dando-lhes o controle necessário sobre suas rotinas. Dessa forma, o Task Mind não apenas resolve a carência imediata de organização, mas também contribui para a redução do estresse e a melhoria do desempenho escolar, posicionando-se como uma ferramenta valiosa no dia a dia do estudante.
-
-
-
-
+Em resumo, o Task Mind busca ser mais que um aplicativo: uma solução integrada que centraliza informações acadêmicas, melhora o controle do tempo e aumenta a produtividade e o desempenho escolar.
 
 
 # 🧠 TaskMind
