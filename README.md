@@ -1,3 +1,35 @@
+## Sobre O Projeto
+
+## Objetivo Principal:
+O projeto Task Mind visa desenvolver um aplicativo móvel gratuito e intuitivo especificamente voltado para a organização da vida acadêmica de estudantes. Seu propósito central é ser uma ferramenta digital prática que auxilie os alunos no planejamento, monitoramento e execução de suas tarefas e compromissos diários, combatendo a desorganização que leva a atrasos, esquecimentos e queda na produtividade.
+
+Funcionalidades-Chave para o Estudante:
+
+Para atingir esse objetivo, o Task Mind irá além de uma simples lista de tarefas, integrando as seguintes funcionalidades:
+
+## Gestão Centralizada de Tarefas e Prazos: 
+Os usuários poderão cadastrar, editar e excluir tarefas, definindo título, descrição, disciplina, prioridade e data de entrega.
+
+ ## Calendário Acadêmico Interativo: 
+ Uma visão integrada do calendário permitirá que o estudante visualize todos os seus prazos (trabalhos, provas, apresentações) de forma semanal ou mensal, facilitando o planejamento de longo prazo.
+
+## Sistema de Lembretes e Notificações Inteligentes: O app enviará notificações automáticas para alertar o usuário sobre prazos próximos, ajudando na gestão do tempo e prevenindo esquecimentos.
+
+## Personalização do Perfil: 
+O estudante poderá customizar sua experiência, organizando as tarefas por disciplinas, cursos ou semestres, tornando o aplicativo adaptável à sua rotina específica.
+
+## Conformidade e Segurança: 
+O projeto prioriza a segurança dos dados do usuário, assegurando que o sistema esteja em conformidade com a LGPD (Lei Geral de Proteção de Dados) e com os padrões de segurança da informação.
+
+## Em Resumo:
+
+O Task Mind se propõe a ser mais do que um app; é uma solução tecnológica integrada que reúne todas as informações acadêmicas em um único local de fácil acesso. Ao unir uma interface amigável a funcionalidades poderosas como um calendário interativo e notificações proativas, o aplicativo busca empoderar os estudantes, dando-lhes o controle necessário sobre suas rotinas. Dessa forma, o Task Mind não apenas resolve a carência imediata de organização, mas também contribui para a redução do estresse e a melhoria do desempenho escolar, posicionando-se como uma ferramenta valiosa no dia a dia do estudante.
+
+
+
+
+
+
 # 🧠 TaskMind
 
 [![Node.js](https://img.shields.io/badge/Node.js-16+-green)](https://nodejs.org/)  
