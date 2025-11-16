@@ -129,7 +129,7 @@ class AuthController {
 
       const usuario = usuarios[0];
       const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const dataExpiracao = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hora
+      const dataExpiracao = new Date(Date.now() + 1 * 60 * 60 * 1000);
 
       await db.execute(
         'INSERT INTO redefinicoes_senha (usuario_id, token, data_expiracao) VALUES (?, ?, ?)',

@@ -4,7 +4,11 @@ import { Calendar } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function CalendarioScreen() {
-  const [selectedDate, setSelectedDate] = useState('');
+
+  // **Define o dia atual automaticamente**
+  const today = new Date().toISOString().split('T')[0];
+
+  const [selectedDate, setSelectedDate] = useState(today);
   const [events, setEvents] = useState([
     { id: '1', date: '2025-11-08', title: 'Reunião com equipe', desc: 'Discutir metas do mês', prioridade: 'alta' },
     { id: '2', date: '2025-11-09', title: 'Entrega de projeto', desc: 'Prazo final da sprint', prioridade: 'média' },
@@ -78,20 +82,22 @@ export default function CalendarioScreen() {
     return acc;
   }, {});
 
+  // Marca o dia selecionado também
+  markedDates[selectedDate] = {
+    selected: true,
+    selectedColor: '#f5b400',
+    marked: markedDates[selectedDate]?.marked,
+    dotColor: markedDates[selectedDate]?.dotColor,
+  };
+
   const eventsOfDay = events.filter(e => e.date === selectedDate);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
+
       <Calendar
         onDayPress={handleDayPress}
-        markedDates={{
-          ...markedDates,
-          [selectedDate]: {
-            selected: true,
-            selectedColor: '#f5b400',
-            marked: true,
-          },
-        }}
+        markedDates={markedDates}
         theme={{
           todayTextColor: '#f5b400',
           arrowColor: '#f5b400',
@@ -101,22 +107,31 @@ export default function CalendarioScreen() {
 
       <View style={{ padding: 15, flex: 1 }}>
         {eventsOfDay.length === 0 ? (
-          <Text style={{ textAlign: 'center', color: 'gray', marginTop: 20 }}>Nenhum evento neste dia.</Text>
+          <Text style={{ textAlign: 'center', color: 'gray', marginTop: 20 }}>
+            Nenhum evento neste dia.
+          </Text>
         ) : (
           <FlatList
             data={eventsOfDay}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.eventCard}>
-                <View style={[styles.priorityDot, { backgroundColor: getColorByPriority(item.prioridade) }]} />
+                <View
+                  style={[
+                    styles.priorityDot,
+                    { backgroundColor: getColorByPriority(item.prioridade) }
+                  ]}
+                />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.eventTitle}>{item.title}</Text>
                   <Text style={styles.eventDesc}>{item.desc}</Text>
                   <Text style={styles.priorityLabel}>Prioridade: {item.prioridade}</Text>
                 </View>
+
                 <TouchableOpacity onPress={() => handleEdit(item)}>
                   <Ionicons name="pencil" size={20} color="#555" />
                 </TouchableOpacity>
+
                 <TouchableOpacity onPress={() => handleDelete(item)}>
                   <Ionicons name="trash" size={20} color="#e53935" style={{ marginLeft: 10 }} />
                 </TouchableOpacity>
@@ -126,18 +141,18 @@ export default function CalendarioScreen() {
         )}
       </View>
 
-      {/* BOTÃO FLUTUANTE */}
-      {selectedDate !== '' && (
-        <TouchableOpacity style={styles.fab} onPress={handleAddPress}>
-          <Ionicons name="add" size={28} color="#fff" />
-        </TouchableOpacity>
-      )}
+      {/* BOTÃO FLUTUANTE SEM CONDIÇÃO */}
+      <TouchableOpacity style={styles.fab} onPress={handleAddPress}>
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
 
-      {/* MODAL DE ADIÇÃO/EDIÇÃO */}
+      {/* MODAL */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingEvent ? 'Editar Evento' : 'Novo Evento'}</Text>
+            <Text style={styles.modalTitle}>
+              {editingEvent ? 'Editar Evento' : 'Novo Evento'}
+            </Text>
 
             <TextInput
               style={styles.input}
@@ -145,6 +160,7 @@ export default function CalendarioScreen() {
               value={newTitle}
               onChangeText={setNewTitle}
             />
+
             <TextInput
               style={[styles.input, { height: 80 }]}
               placeholder="Descrição"
@@ -154,6 +170,7 @@ export default function CalendarioScreen() {
             />
 
             <Text style={styles.label}>Prioridade:</Text>
+
             <View style={styles.priorityRow}>
               {['baixa', 'média', 'alta'].map((p) => (
                 <TouchableOpacity
@@ -161,12 +178,14 @@ export default function CalendarioScreen() {
                   style={[
                     styles.priorityBtn,
                     {
-                      backgroundColor: newPrioridade === p ? getColorByPriority(p) : '#eee',
-                    },
+                      backgroundColor: newPrioridade === p ? getColorByPriority(p) : '#eee'
+                    }
                   ]}
                   onPress={() => setNewPrioridade(p)}
                 >
-                  <Text style={{ color: newPrioridade === p ? '#fff' : '#333', fontWeight: 'bold' }}>{p}</Text>
+                  <Text style={{ color: newPrioridade === p ? '#fff' : '#333', fontWeight: 'bold' }}>
+                    {p}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -176,6 +195,7 @@ export default function CalendarioScreen() {
                 <Ionicons name="checkmark" size={20} color="#fff" />
                 <Text style={styles.btnText}>Salvar</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={20} color="#fff" />
                 <Text style={styles.btnText}>Cancelar</Text>
@@ -184,6 +204,7 @@ export default function CalendarioScreen() {
           </View>
         </View>
       </Modal>
+
     </View>
   );
 }

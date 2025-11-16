@@ -5,7 +5,9 @@ import { TouchableOpacity as RNTouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { dashboardAPI } from '../services/api';
+import BarraProgresso from '../components/BarraProgreso.js'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function HomeScreen({ navigation }) {
   const [dashboard, setDashboard] = useState(null);
@@ -141,6 +143,8 @@ export default function HomeScreen({ navigation }) {
         </View>
 
         {/* Desempenho */}
+
+        
         {dashboard?.desempenho_mensal && (
           <Card style={styles.sectionCard}>
             <Card.Content>
