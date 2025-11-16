@@ -1,3 +1,23 @@
+🧠 Sobre o Projeto
+
+O Task Mind é um aplicativo móvel gratuito e intuitivo voltado para a organização da vida acadêmica de estudantes.
+Seu objetivo é oferecer uma ferramenta prática para planejar, monitorar e executar tarefas e compromissos, ajudando a combater a desorganização que causa atrasos, esquecimentos e queda na produtividade.
+
+O app vai além de uma simples lista de tarefas, reunindo funcionalidades como:
+
+Gestão de tarefas e prazos — criação, edição e exclusão de atividades com título, descrição, disciplina, prioridade e data de entrega.
+
+Calendário acadêmico interativo — visualização semanal e mensal de compromissos e prazos.
+
+Notificações inteligentes — alertas automáticos para lembretes de tarefas próximas.
+
+Personalização do perfil — organização por disciplinas, cursos ou semestres.
+
+Segurança e conformidade com a LGPD — garantindo a proteção dos dados do usuário.
+
+Em resumo, o Task Mind busca ser mais que um aplicativo: uma solução integrada que centraliza informações acadêmicas, melhora o controle do tempo e aumenta a produtividade e o desempenho escolar.
+
+
 # 🧠 TaskMind
 
 [![Node.js](https://img.shields.io/badge/Node.js-16+-green)](https://nodejs.org/)  
